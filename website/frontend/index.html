@@ -1,0 +1,2674 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LORDSBOT — Secure Access</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+    --bg:#030504;
+    --bg2:#070a08;
+    --panel:rgba(10,15,12,.78);
+    --panel2:rgba(15,22,18,.72);
+    --line:rgba(255,255,255,.08);
+    --line2:rgba(120,255,165,.18);
+    --text:#f3fff6;
+    --muted:#89988f;
+    --green:#50ff8b;
+    --green2:#19d66a;
+    --green3:#0c8f45;
+    --danger:#ff5c67;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    min-height:100vh;
+    color:var(--text);
+    background:
+        radial-gradient(circle at 50% -10%,rgba(38,255,115,.10),transparent 35%),
+        radial-gradient(circle at 0% 50%,rgba(20,150,70,.08),transparent 30%),
+        var(--bg);
+    font-family:Inter,Arial,sans-serif;
+    overflow-x:hidden;
+}
+
+/* =========================
+   BACKGROUND
+========================= */
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.16;
+    background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+    background-size:55px 55px;
+    mask-image:linear-gradient(to bottom,black,transparent 90%);
+}
+
+.noise{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:999;
+    opacity:.025;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+}
+
+.cursor-glow{
+    position:fixed;
+    width:420px;
+    height:420px;
+    border-radius:50%;
+    pointer-events:none;
+    background:radial-gradient(circle,rgba(62,255,129,.075),transparent 68%);
+    transform:translate(-50%,-50%);
+    z-index:0;
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
+nav{
+    position:relative;
+    z-index:20;
+    width:100%;
+    height:82px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 6%;
+    border-bottom:1px solid rgba(255,255,255,.055);
+    background:rgba(3,5,4,.65);
+    backdrop-filter:blur(20px);
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-family:"Space Grotesk",sans-serif;
+    font-weight:800;
+    font-size:21px;
+    letter-spacing:2px;
+}
+
+.logo-mark{
+    width:34px;
+    height:34px;
+    display:grid;
+    place-items:center;
+    border:1px solid rgba(80,255,139,.4);
+    border-radius:10px;
+    color:var(--green);
+    box-shadow:
+        0 0 25px rgba(80,255,139,.10),
+        inset 0 0 18px rgba(80,255,139,.06);
+}
+
+.nav-right{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.lang-box{
+    position:relative;
+}
+
+.lang-button{
+    height:40px;
+    padding:0 13px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#d9e8dd;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:10px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.lang-button:hover{
+    border-color:rgba(80,255,139,.3);
+    background:rgba(80,255,139,.05);
+}
+
+.flag{
+    font-size:20px;
+    line-height:1;
+}
+
+.lang-menu{
+    position:absolute;
+    right:0;
+    top:48px;
+    width:180px;
+    padding:7px;
+    background:rgba(8,13,10,.97);
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:13px;
+    box-shadow:0 25px 70px rgba(0,0,0,.5);
+    display:none;
+}
+
+.lang-menu.active{
+    display:block;
+    animation:drop .18s ease;
+}
+
+@keyframes drop{
+    from{
+        opacity:0;
+        transform:translateY(-5px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.lang-option{
+    width:100%;
+    border:0;
+    background:transparent;
+    color:#dce9df;
+    padding:10px 11px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border-radius:8px;
+    cursor:pointer;
+    text-align:left;
+    font-size:14px;
+}
+
+.lang-option:hover{
+    background:rgba(80,255,139,.08);
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+    position:relative;
+    z-index:2;
+    min-height:calc(100vh - 82px);
+    display:grid;
+    grid-template-columns:1.1fr .9fr;
+    align-items:center;
+    gap:70px;
+    max-width:1400px;
+    margin:auto;
+    padding:80px 6%;
+}
+
+.hero-left{
+    position:relative;
+}
+
+.status{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    padding:8px 12px;
+    border-radius:100px;
+    border:1px solid rgba(80,255,139,.16);
+    background:rgba(80,255,139,.045);
+    color:#a8dcb8;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.5px;
+    margin-bottom:28px;
+}
+
+.status-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 13px var(--green);
+    animation:pulse 1.7s infinite;
+}
+
+@keyframes pulse{
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:.4;transform:scale(.75)}
+}
+
+.hero h1{
+    font-family:"Space Grotesk",sans-serif;
+    font-size:clamp(48px,6vw,88px);
+    line-height:.95;
+    letter-spacing:-4px;
+    max-width:800px;
+}
+
+.hero h1 span{
+    color:var(--green);
+    text-shadow:0 0 45px rgba(80,255,139,.15);
+}
+
+.hero-desc{
+    max-width:650px;
+    color:#87968d;
+    font-size:16px;
+    line-height:1.8;
+    margin-top:27px;
+}
+
+.hero-actions{
+    display:flex;
+    gap:13px;
+    margin-top:36px;
+    flex-wrap:wrap;
+}
+
+.btn{
+    border:0;
+    cursor:pointer;
+    height:52px;
+    padding:0 23px;
+    border-radius:11px;
+    font-weight:700;
+    font-size:14px;
+    transition:.25s;
+}
+
+.btn-primary{
+    color:#001d0c;
+    background:var(--green);
+    box-shadow:0 0 30px rgba(80,255,139,.12);
+}
+
+.btn-primary:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 35px rgba(80,255,139,.18);
+}
+
+.btn-secondary{
+    color:#d9e7dc;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.09);
+}
+
+.btn-secondary:hover{
+    border-color:rgba(80,255,139,.25);
+    background:rgba(80,255,139,.04);
+}
+
+/* =========================
+   LOGIN CARD
+========================= */
+
+.auth-wrap{
+    position:relative;
+}
+
+.auth-glow{
+    position:absolute;
+    width:300px;
+    height:300px;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle,rgba(49,255,120,.13),transparent 65%);
+    filter:blur(20px);
+    pointer-events:none;
+}
+
+.auth-card{
+    position:relative;
+    z-index:2;
+    padding:34px;
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:24px;
+    background:
+        linear-gradient(145deg,rgba(17,25,20,.88),rgba(7,11,9,.9));
+    backdrop-filter:blur(25px);
+    box-shadow:
+        0 35px 100px rgba(0,0,0,.48),
+        inset 0 1px rgba(255,255,255,.04);
+}
+
+.card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:28px;
+}
+
+.card-title{
+    font-family:"Space Grotesk",sans-serif;
+    font-size:25px;
+    font-weight:700;
+}
+
+.card-sub{
+    color:#718078;
+    font-size:12px;
+    margin-top:7px;
+}
+
+.lock-icon{
+    width:43px;
+    height:43px;
+    display:grid;
+    place-items:center;
+    border-radius:12px;
+    color:var(--green);
+    background:rgba(80,255,139,.06);
+    border:1px solid rgba(80,255,139,.13);
+    font-size:19px;
+}
+
+.form-group{
+    margin-bottom:17px;
+}
+
+.form-label{
+    display:block;
+    color:#a9b8ae;
+    font-size:12px;
+    font-weight:600;
+    margin-bottom:8px;
+}
+
+.input-wrap{
+    position:relative;
+}
+
+.input-icon{
+    position:absolute;
+    left:14px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#607067;
+    font-size:15px;
+    pointer-events:none;
+}
+
+input{
+    width:100%;
+    height:49px;
+    padding:0 14px 0 41px;
+    color:#ecfff1;
+    background:rgba(0,0,0,.23);
+    border:1px solid rgba(255,255,255,.075);
+    border-radius:10px;
+    outline:none;
+    font-family:inherit;
+    font-size:13px;
+    transition:.2s;
+}
+
+input::placeholder{
+    color:#4f5c55;
+}
+
+input:focus{
+    border-color:rgba(80,255,139,.4);
+    box-shadow:0 0 0 3px rgba(80,255,139,.055);
+}
+
+.auth-submit{
+    width:100%;
+    margin-top:5px;
+}
+
+.message{
+    white-space:pre-line;
+    display:none;
+    padding:11px 13px;
+    border-radius:9px;
+    margin-bottom:14px;
+    font-size:12px;
+    line-height:1.55;
+}
+
+.message.show{
+    display:block;
+}
+
+.message.error{
+    color:#ffb7bc;
+    background:rgba(255,70,80,.07);
+    border:1px solid rgba(255,70,80,.14);
+}
+
+.message.success{
+    color:#9dffba;
+    background:rgba(80,255,139,.06);
+    border:1px solid rgba(80,255,139,.14);
+}
+
+.switch-auth{
+    text-align:center;
+    margin-top:21px;
+    color:#65736b;
+    font-size:12px;
+}
+
+.switch-auth button{
+    border:0;
+    background:none;
+    color:var(--green);
+    cursor:pointer;
+    font-weight:700;
+    margin-left:5px;
+}
+
+.security-line{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:7px;
+    color:#56635b;
+    font-size:10px;
+    margin-top:20px;
+}
+
+.security-line span{
+    color:var(--green);
+}
+
+/* =========================
+   FLOATING INFO
+========================= */
+
+.floating-card{
+    position:absolute;
+    z-index:4;
+    padding:13px 15px;
+    min-width:145px;
+    border-radius:13px;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(7,12,9,.84);
+    backdrop-filter:blur(16px);
+    box-shadow:0 18px 45px rgba(0,0,0,.35);
+}
+
+.float-one{
+    right:-65px;
+    top:40px;
+    animation:float1 5s ease-in-out infinite;
+}
+
+.float-two{
+    left:-80px;
+    bottom:65px;
+    animation:float2 6s ease-in-out infinite;
+}
+
+@keyframes float1{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-12px)}
+}
+
+@keyframes float2{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(10px)}
+}
+
+.float-icon{
+    color:var(--green);
+    font-size:17px;
+    margin-bottom:7px;
+}
+
+.float-title{
+    font-size:11px;
+    color:#d9e5dc;
+    font-weight:700;
+}
+
+.float-text{
+    font-size:9px;
+    color:#59665f;
+    margin-top:4px;
+}
+
+/* =========================
+   FEATURES
+========================= */
+
+.section{
+    position:relative;
+    z-index:2;
+    max-width:1400px;
+    margin:auto;
+    padding:120px 6%;
+}
+
+.section-heading{
+    max-width:700px;
+    margin-bottom:45px;
+}
+
+.eyebrow{
+    color:var(--green);
+    text-transform:uppercase;
+    letter-spacing:3px;
+    font-size:10px;
+    font-weight:800;
+    margin-bottom:13px;
+}
+
+.section-heading h2{
+    font-family:"Space Grotesk",sans-serif;
+    font-size:clamp(34px,4vw,55px);
+    letter-spacing:-2px;
+}
+
+.section-heading p{
+    color:#75827a;
+    margin-top:15px;
+    line-height:1.7;
+    font-size:14px;
+}
+
+.features{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+}
+
+.feature{
+    position:relative;
+    padding:29px;
+    min-height:225px;
+    border:1px solid rgba(255,255,255,.065);
+    border-radius:19px;
+    background:linear-gradient(145deg,rgba(16,22,18,.72),rgba(7,10,8,.72));
+    overflow:hidden;
+    transition:.3s;
+}
+
+.feature:hover{
+    transform:translateY(-5px);
+    border-color:rgba(80,255,139,.17);
+    box-shadow:0 20px 60px rgba(0,0,0,.25);
+}
+
+.feature::after{
+    content:"";
+    position:absolute;
+    width:140px;
+    height:140px;
+    right:-50px;
+    bottom:-50px;
+    border-radius:50%;
+    background:rgba(80,255,139,.045);
+    filter:blur(15px);
+}
+
+.feature-symbol{
+    width:49px;
+    height:49px;
+    display:grid;
+    place-items:center;
+    border-radius:13px;
+    color:var(--green);
+    background:rgba(80,255,139,.05);
+    border:1px solid rgba(80,255,139,.12);
+    font-size:21px;
+    margin-bottom:25px;
+}
+
+.feature h3{
+    font-family:"Space Grotesk",sans-serif;
+    font-size:18px;
+    margin-bottom:10px;
+}
+
+.feature p{
+    color:#68766e;
+    line-height:1.65;
+    font-size:12px;
+}
+
+/* =========================
+   SYSTEM PREVIEW
+========================= */
+
+.preview{
+    display:grid;
+    grid-template-columns:1fr 1.2fr;
+    gap:50px;
+    align-items:center;
+}
+
+.preview-text h2{
+    font-family:"Space Grotesk",sans-serif;
+    font-size:clamp(34px,4vw,54px);
+    letter-spacing:-2px;
+}
+
+.preview-text p{
+    color:#718078;
+    font-size:14px;
+    line-height:1.8;
+    margin-top:18px;
+}
+
+.preview-list{
+    margin-top:28px;
+    display:flex;
+    flex-direction:column;
+    gap:11px;
+}
+
+.preview-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#aab8af;
+    font-size:12px;
+}
+
+.preview-item i{
+    width:20px;
+    height:20px;
+    display:grid;
+    place-items:center;
+    border-radius:6px;
+    color:var(--green);
+    background:rgba(80,255,139,.06);
+    font-style:normal;
+}
+
+.dashboard-preview{
+    position:relative;
+    padding:20px;
+    min-height:390px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,.07);
+    background:#080c09;
+    box-shadow:0 30px 90px rgba(0,0,0,.38);
+}
+
+.preview-topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding-bottom:17px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.fake-logo{
+    display:flex;
+    gap:7px;
+    align-items:center;
+    font-size:11px;
+    font-weight:800;
+}
+
+.fake-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:var(--green);
+}
+
+.fake-user{
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+}
+
+.preview-content{
+    display:grid;
+    grid-template-columns:90px 1fr;
+    gap:15px;
+    margin-top:20px;
+}
+
+.fake-sidebar{
+    border-right:1px solid rgba(255,255,255,.05);
+    min-height:290px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.fake-side-line{
+    width:58px;
+    height:7px;
+    border-radius:5px;
+    background:rgba(255,255,255,.06);
+}
+
+.fake-side-line.active{
+    background:rgba(80,255,139,.22);
+}
+
+.fake-main{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.fake-box{
+    min-height:105px;
+    padding:16px;
+    border:1px solid rgba(255,255,255,.055);
+    border-radius:12px;
+    background:rgba(255,255,255,.018);
+}
+
+.fake-number{
+    font-family:"Space Grotesk",sans-serif;
+    font-size:24px;
+    font-weight:700;
+    color:#dfffe8;
+}
+
+.fake-label{
+    color:#59665f;
+    font-size:9px;
+    margin-top:5px;
+}
+
+.fake-chart{
+    grid-column:span 2;
+    min-height:130px;
+    position:relative;
+    overflow:hidden;
+}
+
+.chart-line{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:25px;
+    height:80px;
+    background:
+        linear-gradient(150deg,transparent 0 8%,rgba(80,255,139,.8) 9% 10%,transparent 11% 18%,rgba(80,255,139,.7) 19% 20%,transparent 21% 30%,rgba(80,255,139,.8) 31% 32%,transparent 33% 46%,rgba(80,255,139,.8) 47% 48%,transparent 49% 65%,rgba(80,255,139,.75) 66% 67%,transparent 68%);
+    opacity:.45;
+}
+
+/* =========================
+   SECURITY
+========================= */
+
+.security{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+}
+
+.security-box{
+    padding:25px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.06);
+    background:rgba(255,255,255,.018);
+}
+
+.security-symbol{
+    font-size:20px;
+    color:var(--green);
+    margin-bottom:18px;
+}
+
+.security-box h4{
+    font-size:13px;
+    margin-bottom:8px;
+}
+
+.security-box p{
+    color:#606d65;
+    font-size:10px;
+    line-height:1.6;
+}
+
+/* =========================
+   CTA
+========================= */
+
+.cta{
+    position:relative;
+    overflow:hidden;
+    text-align:center;
+    padding:85px 25px;
+    border-top:1px solid rgba(255,255,255,.05);
+    border-bottom:1px solid rgba(255,255,255,.05);
+    background:
+        radial-gradient(circle at 50% 100%,rgba(80,255,139,.10),transparent 45%),
+        rgba(255,255,255,.01);
+}
+
+.cta h2{
+    position:relative;
+    font-family:"Space Grotesk",sans-serif;
+    font-size:clamp(35px,5vw,65px);
+    letter-spacing:-3px;
+}
+
+.cta p{
+    position:relative;
+    color:#68766e;
+    font-size:13px;
+    margin:15px auto 28px;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+    padding:28px 6%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    color:#465149;
+    font-size:10px;
+}
+
+.footer-brand{
+    color:#6a786f;
+    font-weight:700;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:1000px){
+
+    .hero{
+        grid-template-columns:1fr;
+        padding-top:65px;
+    }
+
+    .hero-left{
+        text-align:center;
+    }
+
+    .hero-desc{
+        margin-left:auto;
+        margin-right:auto;
+    }
+
+    .hero-actions{
+        justify-content:center;
+    }
+
+    .auth-wrap{
+        max-width:520px;
+        width:100%;
+        margin:auto;
+    }
+
+    .float-one{
+        right:-10px;
+    }
+
+    .float-two{
+        left:-10px;
+    }
+
+    .features{
+        grid-template-columns:1fr;
+    }
+
+    .preview{
+        grid-template-columns:1fr;
+    }
+
+    .security{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:600px){
+
+    nav{
+        padding:0 20px;
+    }
+
+    .logo{
+        font-size:16px;
+    }
+
+    .hero{
+        padding:55px 20px 80px;
+    }
+
+    .hero h1{
+        font-size:48px;
+        letter-spacing:-2.5px;
+    }
+
+    .auth-card{
+        padding:24px 19px;
+        border-radius:19px;
+    }
+
+    .floating-card{
+        display:none;
+    }
+
+    .section{
+        padding:80px 20px;
+    }
+
+    .security{
+        grid-template-columns:1fr;
+    }
+
+    .dashboard-preview{
+        min-height:330px;
+    }
+
+    .preview-content{
+        grid-template-columns:65px 1fr;
+    }
+
+    footer{
+        padding:25px 20px;
+        gap:15px;
+        flex-direction:column;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="noise"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- ================= NAVBAR ================= -->
+
+<nav>
+
+    <div class="logo">
+        <div class="logo-mark">◈</div>
+        LORDSBOT
+    </div>
+
+    <div class="nav-right">
+
+        <div class="lang-box">
+
+            <button class="lang-button" id="langButton">
+                <span class="flag" id="currentFlag">🇹🇷</span>
+                <span id="currentLang">TR</span>
+                <span>⌄</span>
+            </button>
+
+            <div class="lang-menu" id="langMenu">
+
+                <button class="lang-option" data-lang="az">
+                    <span class="flag">🇦🇿</span>
+                    <span>Azərbaycan</span>
+                </button>
+
+                <button class="lang-option" data-lang="tr">
+                    <span class="flag">🇹🇷</span>
+                    <span>Türkçe</span>
+                </button>
+
+                <button class="lang-option" data-lang="ru">
+                    <span class="flag">🇷🇺</span>
+                    <span>Русский</span>
+                </button>
+
+                <button class="lang-option" data-lang="en">
+                    <span class="flag">🇬🇧</span>
+                    <span>English</span>
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- ================= HERO ================= -->
+
+<section class="hero">
+
+    <div class="hero-left">
+
+        <div class="status">
+            <span class="status-dot"></span>
+            <span data-i18n="status">SYSTEM ONLINE • SECURE ACCESS</span>
+        </div>
+
+        <h1>
+            <span>LORDS</span><br>
+            <span data-i18n="heroTitle">CONTROL.</span>
+        </h1>
+
+        <p class="hero-desc" data-i18n="heroDesc">
+            Botlarını, lisanslarını ve sistemlerini tek merkezden yönet.
+            Güçlü altyapı. Temiz kontrol. Sınırları olmayan bir yönetim deneyimi.
+        </p>
+
+        <div class="hero-actions">
+
+            <button class="btn btn-primary" onclick="scrollToAuth()" data-i18n="start">
+                Sisteme Gir
+            </button>
+
+            <button class="btn btn-secondary" onclick="scrollToFeatures()" data-i18n="discover">
+                Sistemi Keşfet
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- AUTH -->
+
+    <div class="auth-wrap" id="auth">
+
+        <div class="auth-glow"></div>
+
+        <div class="floating-card float-one">
+
+            <div class="float-icon">⌁</div>
+            <div class="float-title" data-i18n="float1Title">
+                LIVE NETWORK
+            </div>
+            <div class="float-text" data-i18n="float1Text">
+                Connection encrypted
+            </div>
+
+        </div>
+
+        <div class="floating-card float-two">
+
+            <div class="float-icon">◇</div>
+            <div class="float-title" data-i18n="float2Title">
+                LICENSE CORE
+            </div>
+            <div class="float-text" data-i18n="float2Text">
+                Verification active
+            </div>
+
+        </div>
+
+
+        <div class="auth-card">
+
+            <div class="card-top">
+
+                <div>
+                    <div class="card-title" id="authTitle">
+                        Sisteme Giriş
+                    </div>
+
+                    <div class="card-sub" id="authSubtitle">
+                        LORDSBOT kontrol merkezine hoş geldin.
+                    </div>
+                </div>
+
+                <div class="lock-icon">⌘</div>
+
+            </div>
+
+
+            <div class="message" id="message"></div>
+
+
+            <form id="authForm">
+
+                <!-- USERNAME -->
+
+                <div class="form-group">
+
+                    <label class="form-label" for="username" data-i18n="username">
+                        Kullanıcı Adı
+                    </label>
+
+                    <div class="input-wrap">
+
+                        <span class="input-icon">◉</span>
+
+                        <input
+                            id="username"
+                            type="text"
+                            autocomplete="username"
+                            placeholder="Kullanıcı adınızı girin"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="form-group">
+
+                    <label class="form-label" for="password" data-i18n="password">
+                        Şifre
+                    </label>
+
+                    <div class="input-wrap">
+
+                        <span class="input-icon">◇</span>
+
+                        <input
+                            id="password"
+                            type="password"
+                            autocomplete="current-password"
+                            placeholder="Şifrenizi girin"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary auth-submit"
+                    id="submitButton"
+                >
+
+                    <span id="submitText" data-i18n="login">
+                        Giriş Yap
+                    </span>
+
+                </button>
+
+            </form>
+
+
+            <div class="switch-auth">
+
+                <span id="switchText">
+                    Hesabın yok mu?
+                </span>
+
+                <button id="switchButton" type="button">
+                    Kayıt Ol
+                </button>
+
+            </div>
+
+
+            <div class="security-line">
+                <span>◆</span>
+                <span data-i18n="encrypted">
+                    Protected connection • End-to-end secured
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= FEATURES ================= -->
+
+<section class="section" id="features">
+
+    <div class="section-heading">
+
+        <div class="eyebrow" data-i18n="featuresEyebrow">
+            THE CORE
+        </div>
+
+        <h2 data-i18n="featuresTitle">
+            Sadece bir panel değil.
+        </h2>
+
+        <p data-i18n="featuresDesc">
+            LORDSBOT, kontrolü tek bir yerde toplamak için tasarlandı.
+            Karmaşık işlemler arka planda kalır. Sen sadece gücü yönetirsin.
+        </p>
+
+    </div>
+
+
+    <div class="features">
+
+
+        <!-- ÖZEL SEMBOL 1 -->
+
+        <div class="feature">
+
+            <div class="feature-symbol">◈</div>
+
+            <h3 data-i18n="feature1Title">
+                Merkezi Kontrol
+            </h3>
+
+            <p data-i18n="feature1Text">
+                Tüm bot ve sistem durumlarını tek bir merkezden izle.
+                Yönetim karmaşasını ortadan kaldır.
+            </p>
+
+        </div>
+
+
+        <!-- ÖZEL SEMBOL 2 -->
+
+        <div class="feature">
+
+            <div class="feature-symbol">⌁</div>
+
+            <h3 data-i18n="feature2Title">
+                Anlık Senkronizasyon
+            </h3>
+
+            <p data-i18n="feature2Text">
+                Sistem bilgileri ve lisans durumları sürekli güncel tutulur.
+            </p>
+
+        </div>
+
+
+        <!-- ÖZEL SEMBOL 3 -->
+
+        <div class="feature">
+
+            <div class="feature-symbol">◇</div>
+
+            <h3 data-i18n="feature3Title">
+                Lisans Güvenliği
+            </h3>
+
+            <p data-i18n="feature3Text">
+                Lisans doğrulama sistemi ile yetkileri kontrol altında tut.
+            </p>
+
+        </div>
+
+
+        <!-- ÖZEL SEMBOL 4 -->
+
+        <div class="feature">
+
+            <div class="feature-symbol">✦</div>
+
+            <h3 data-i18n="feature4Title">
+                Temiz Mimari
+            </h3>
+
+            <p data-i18n="feature4Text">
+                Gereksiz karmaşa yok. Sade, hızlı ve modern bir kontrol deneyimi.
+            </p>
+
+        </div>
+
+
+        <!-- ÖZEL SEMBOL 5 -->
+
+        <div class="feature">
+
+            <div class="feature-symbol">⌬</div>
+
+            <h3 data-i18n="feature5Title">
+                Yetki Sistemi
+            </h3>
+
+            <p data-i18n="feature5Text">
+                Kullanıcı ve yönetici erişimlerini güvenli şekilde ayır.
+            </p>
+
+        </div>
+
+
+        <!-- ÖZEL SEMBOL 6 -->
+
+        <div class="feature">
+
+            <div class="feature-symbol">∞</div>
+
+            <h3 data-i18n="feature6Title">
+                Sınırsız Ölçek
+            </h3>
+
+            <p data-i18n="feature6Text">
+                Sistem büyüdükçe kontrol panelin de seninle birlikte büyür.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= PREVIEW ================= -->
+
+<section class="section">
+
+    <div class="preview">
+
+        <div class="preview-text">
+
+            <div class="eyebrow" data-i18n="previewEyebrow">
+                CONTROL CENTER
+            </div>
+
+            <h2 data-i18n="previewTitle">
+                Kontrol sende.
+            </h2>
+
+            <p data-i18n="previewDesc">
+                Kullanıcılar, lisanslar ve botlar için hazırlanmış
+                sade ama güçlü bir yönetim deneyimi.
+            </p>
+
+
+            <div class="preview-list">
+
+                <div class="preview-item">
+                    <i>✓</i>
+                    <span data-i18n="preview1">Lisans durumlarını görüntüle</span>
+                </div>
+
+                <div class="preview-item">
+                    <i>✓</i>
+                    <span data-i18n="preview2">Aktif sistemleri takip et</span>
+                </div>
+
+                <div class="preview-item">
+                    <i>✓</i>
+                    <span data-i18n="preview3">Yetkileri merkezi olarak yönet</span>
+                </div>
+
+                <div class="preview-item">
+                    <i>✓</i>
+                    <span data-i18n="preview4">Güvenli erişim kullan</span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-preview">
+
+            <div class="preview-topbar">
+
+                <div class="fake-logo">
+                    <span class="fake-dot"></span>
+                    LORDSBOT
+                </div>
+
+                <div class="fake-user"></div>
+
+            </div>
+
+
+            <div class="preview-content">
+
+                <div class="fake-sidebar">
+
+                    <div class="fake-side-line active"></div>
+                    <div class="fake-side-line"></div>
+                    <div class="fake-side-line"></div>
+                    <div class="fake-side-line"></div>
+                    <div class="fake-side-line"></div>
+
+                </div>
+
+
+                <div class="fake-main">
+
+                    <div class="fake-box">
+
+                        <div class="fake-number">24</div>
+
+                        <div class="fake-label">
+                            ACTIVE USERS
+                        </div>
+
+                    </div>
+
+
+                    <div class="fake-box">
+
+                        <div class="fake-number">08</div>
+
+                        <div class="fake-label">
+                            LICENSES
+                        </div>
+
+                    </div>
+
+
+                    <div class="fake-box">
+
+                        <div class="fake-number">99%</div>
+
+                        <div class="fake-label">
+                            SYSTEM STATUS
+                        </div>
+
+                    </div>
+
+
+                    <div class="fake-box">
+
+                        <div class="fake-number">ON</div>
+
+                        <div class="fake-label">
+                            SECURITY
+                        </div>
+
+                    </div>
+
+
+                    <div class="fake-box fake-chart">
+
+                        <div class="fake-label">
+                            SYSTEM ACTIVITY
+                        </div>
+
+                        <div class="chart-line"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= SECURITY ================= -->
+
+<section class="section">
+
+    <div class="section-heading">
+
+        <div class="eyebrow">
+            SECURITY
+        </div>
+
+        <h2 data-i18n="securityTitle">
+            Sistem arkada sessizce çalışır.
+        </h2>
+
+        <p data-i18n="securityDesc">
+            Sen kontrol ederken güvenlik katmanları arka planda görevini yapar.
+        </p>
+
+    </div>
+
+
+    <div class="security">
+
+        <div class="security-box">
+
+            <div class="security-symbol">⌁</div>
+
+            <h4 data-i18n="sec1Title">
+                Encrypted
+            </h4>
+
+            <p data-i18n="sec1Text">
+                İstemci ve sunucu arasındaki iletişim korunur.
+            </p>
+
+        </div>
+
+
+        <div class="security-box">
+
+            <div class="security-symbol">◇</div>
+
+            <h4 data-i18n="sec2Title">
+                Token Auth
+            </h4>
+
+            <p data-i18n="sec2Text">
+                Oturum doğrulama token tabanlı güvenli erişim kullanır.
+            </p>
+
+        </div>
+
+
+        <div class="security-box">
+
+            <div class="security-symbol">⌬</div>
+
+            <h4 data-i18n="sec3Title">
+                Permission
+            </h4>
+
+            <p data-i18n="sec3Text">
+                Yetkiler kullanıcı rollerine göre kontrol edilir.
+            </p>
+
+        </div>
+
+
+        <div class="security-box">
+
+            <div class="security-symbol">✦</div>
+
+            <h4 data-i18n="sec4Title">
+                Monitoring
+            </h4>
+
+            <p data-i18n="sec4Text">
+                Sistem durumları merkezi olarak izlenebilir.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= CTA ================= -->
+
+<section class="cta">
+
+    <h2 data-i18n="ctaTitle">
+        Kontrolü eline al.
+    </h2>
+
+    <p data-i18n="ctaDesc">
+        LORDSBOT sistemine güvenli şekilde bağlan.
+    </p>
+
+    <button
+        class="btn btn-primary"
+        onclick="scrollToAuth()"
+        data-i18n="ctaButton"
+    >
+        Başla
+    </button>
+
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <div class="footer-brand">
+        LORDSBOT
+    </div>
+
+    <div>
+        © 2026 LORDSBOT • <span data-i18n="footer">Secure Control System</span>
+    </div>
+
+</footer>
+
+
+<script>
+
+/* =========================================
+   API
+========================================= */
+
+const API_URL = "http://127.0.0.1:8001";
+
+
+/* =========================================
+   AUTH STATE
+========================================= */
+
+let registerMode = false;
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
+
+const authForm = document.getElementById("authForm");
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
+
+const authTitle = document.getElementById("authTitle");
+const authSubtitle = document.getElementById("authSubtitle");
+
+const submitButton = document.getElementById("submitButton");
+const submitText = document.getElementById("submitText");
+
+const switchText = document.getElementById("switchText");
+const switchButton = document.getElementById("switchButton");
+
+const message = document.getElementById("message");
+
+
+/* =========================================
+   TRANSLATIONS
+========================================= */
+
+const translations = {
+
+    tr:{
+
+        status:"SYSTEM ONLINE • GÜVENLİ ERİŞİM",
+
+        heroTitle:"KONTROL.",
+        heroDesc:"Botlarını, lisanslarını ve sistemlerini tek merkezden yönet. Güçlü altyapı. Temiz kontrol. Sınırları olmayan bir yönetim deneyimi.",
+
+        start:"Sisteme Gir",
+        discover:"Sistemi Keşfet",
+
+        username:"Kullanıcı Adı",
+        password:"Şifre",
+
+        login:"Giriş Yap",
+        register:"Kayıt Ol",
+
+        loginTitle:"Sisteme Giriş",
+        loginSubtitle:"LORDSBOT kontrol merkezine hoş geldin.",
+
+        registerTitle:"Yeni Hesap",
+        registerSubtitle:"LORDSBOT dünyasına katıl.",
+
+        accountQuestion:"Hesabın yok mu?",
+        accountExists:"Zaten hesabın var mı?",
+
+        encrypted:"Protected connection • End-to-end secured",
+
+        float1Title:"LIVE NETWORK",
+        float1Text:"Connection encrypted",
+
+        float2Title:"LICENSE CORE",
+        float2Text:"Verification active",
+
+        featuresEyebrow:"THE CORE",
+        featuresTitle:"Sadece bir panel değil.",
+        featuresDesc:"LORDSBOT, kontrolü tek bir yerde toplamak için tasarlandı. Karmaşık işlemler arka planda kalır. Sen sadece gücü yönetirsin.",
+
+        feature1Title:"Merkezi Kontrol",
+        feature1Text:"Tüm bot ve sistem durumlarını tek bir merkezden izle. Yönetim karmaşasını ortadan kaldır.",
+
+        feature2Title:"Anlık Senkronizasyon",
+        feature2Text:"Sistem bilgileri ve lisans durumları sürekli güncel tutulur.",
+
+        feature3Title:"Lisans Güvenliği",
+        feature3Text:"Lisans doğrulama sistemi ile yetkileri kontrol altında tut.",
+
+        feature4Title:"Temiz Mimari",
+        feature4Text:"Gereksiz karmaşa yok. Sade, hızlı ve modern bir kontrol deneyimi.",
+
+        feature5Title:"Yetki Sistemi",
+        feature5Text:"Kullanıcı ve yönetici erişimlerini güvenli şekilde ayır.",
+
+        feature6Title:"Sınırsız Ölçek",
+        feature6Text:"Sistem büyüdükçe kontrol panelin de seninle birlikte büyür.",
+
+        previewEyebrow:"CONTROL CENTER",
+        previewTitle:"Kontrol sende.",
+        previewDesc:"Kullanıcılar, lisanslar ve botlar için hazırlanmış sade ama güçlü bir yönetim deneyimi.",
+
+        preview1:"Lisans durumlarını görüntüle",
+        preview2:"Aktif sistemleri takip et",
+        preview3:"Yetkileri merkezi olarak yönet",
+        preview4:"Güvenli erişim kullan",
+
+        securityTitle:"Sistem arkada sessizce çalışır.",
+        securityDesc:"Sen kontrol ederken güvenlik katmanları arka planda görevini yapar.",
+
+        sec1Title:"Encrypted",
+        sec1Text:"İstemci ve sunucu arasındaki iletişim korunur.",
+
+        sec2Title:"Token Auth",
+        sec2Text:"Oturum doğrulama token tabanlı güvenli erişim kullanır.",
+
+        sec3Title:"Permission",
+        sec3Text:"Yetkiler kullanıcı rollerine göre kontrol edilir.",
+
+        sec4Title:"Monitoring",
+        sec4Text:"Sistem durumları merkezi olarak izlenebilir.",
+
+        ctaTitle:"Kontrolü eline al.",
+        ctaDesc:"LORDSBOT sistemine güvenli şekilde bağlan.",
+        ctaButton:"Başla",
+
+        footer:"Secure Control System",
+
+        loginSuccess:"Giriş başarılı. Kontrol merkezine yönlendiriliyorsun...",
+        registerSuccess:"Hesap başarıyla oluşturuldu. Giriş yapabilirsin.",
+
+        loginError:"Giriş yapılamadı.",
+        registerError:"Kayıt oluşturulamadı.",
+
+        serverError:"Sunucuya bağlanılamadı.\n\nBackend'in 127.0.0.1:8001 üzerinde çalıştığından emin ol.",
+
+        usernamePlaceholder:"Kullanıcı adınızı girin",
+        passwordPlaceholder:"Şifrenizi girin"
+
+    },
+
+
+    az:{
+
+        status:"SİSTEM AKTİVDİR • TƏHLÜKƏSİZ GİRİŞ",
+
+        heroTitle:"NƏZARƏT.",
+        heroDesc:"Botlarınızı, lisenziyalarınızı və sistemlərinizi bir mərkəzdən idarə edin. Güclü infrastruktur. Təmiz idarəetmə.",
+
+        start:"Sistemə daxil ol",
+        discover:"Sistemi kəşf et",
+
+        username:"İstifadəçi adı",
+        password:"Şifrə",
+
+        login:"Daxil ol",
+        register:"Qeydiyyatdan keç",
+
+        loginTitle:"Sistemə giriş",
+        loginSubtitle:"LORDSBOT idarəetmə mərkəzinə xoş gəlmisiniz.",
+
+        registerTitle:"Yeni hesab",
+        registerSubtitle:"LORDSBOT dünyasına qoşul.",
+
+        accountQuestion:"Hesabınız yoxdur?",
+        accountExists:"Artıq hesabınız var?",
+
+        encrypted:"Qorunan bağlantı • Təhlükəsiz əlaqə",
+
+        float1Title:"LIVE NETWORK",
+        float1Text:"Bağlantı şifrələnib",
+
+        float2Title:"LICENSE CORE",
+        float2Text:"Doğrulama aktivdir",
+
+        featuresEyebrow:"THE CORE",
+        featuresTitle:"Sadəcə panel deyil.",
+        featuresDesc:"LORDSBOT bütün idarəetməni bir yerdə toplamaq üçün hazırlanıb.",
+
+        feature1Title:"Mərkəzi idarəetmə",
+        feature1Text:"Bütün bot və sistem vəziyyətlərini bir mərkəzdən izləyin.",
+
+        feature2Title:"Ani sinxronizasiya",
+        feature2Text:"Sistem və lisenziya məlumatları daim yenilənir.",
+
+        feature3Title:"Lisenziya təhlükəsizliyi",
+        feature3Text:"Lisenziya yoxlaması ilə girişləri nəzarətdə saxlayın.",
+
+        feature4Title:"Təmiz arxitektura",
+        feature4Text:"Sadə, sürətli və müasir idarəetmə təcrübəsi.",
+
+        feature5Title:"İcazə sistemi",
+        feature5Text:"İstifadəçi və admin girişlərini təhlükəsiz şəkildə ayırın.",
+
+        feature6Title:"Limitsiz miqyas",
+        feature6Text:"Sistem böyüdükcə panel də sizinlə böyüyür.",
+
+        previewEyebrow:"CONTROL CENTER",
+        previewTitle:"Nəzarət sizdədir.",
+        previewDesc:"İstifadəçilər, lisenziyalar və botlar üçün güclü idarəetmə mərkəzi.",
+
+        preview1:"Lisenziya vəziyyətlərini görüntülə",
+        preview2:"Aktiv sistemləri izləmə",
+        preview3:"İcazələri mərkəzdən idarə et",
+        preview4:"Təhlükəsiz giriş istifadə et",
+
+        securityTitle:"Sistem arxa planda səssiz işləyir.",
+        securityDesc:"Siz idarə edərkən təhlükəsizlik qatları arxa planda işləyir.",
+
+        sec1Title:"Encrypted",
+        sec1Text:"Müştəri və server arasındakı əlaqə qorunur.",
+
+        sec2Title:"Token Auth",
+        sec2Text:"Sessiya yoxlaması token əsaslı təhlükəsiz girişdən istifadə edir.",
+
+        sec3Title:"Permission",
+        sec3Text:"İcazələr istifadəçi rollarına görə idarə olunur.",
+
+        sec4Title:"Monitoring",
+        sec4Text:"Sistem vəziyyətləri mərkəzdən izlənə bilər.",
+
+        ctaTitle:"Nəzarəti əlinə al.",
+        ctaDesc:"LORDSBOT sisteminə təhlükəsiz şəkildə qoşul.",
+        ctaButton:"Başla",
+
+        footer:"Secure Control System",
+
+        loginSuccess:"Giriş uğurludur. İdarəetmə mərkəzinə yönləndirilirsən...",
+        registerSuccess:"Hesab uğurla yaradıldı. İndi daxil ola bilərsən.",
+
+        loginError:"Giriş mümkün olmadı.",
+        registerError:"Qeydiyyat mümkün olmadı.",
+
+        serverError:"Serverə qoşulmaq mümkün olmadı.\n\nBackend-in 127.0.0.1:8001 üzərində işlədiyinə əmin olun.",
+
+        usernamePlaceholder:"İstifadəçi adınızı daxil edin",
+        passwordPlaceholder:"Şifrənizi daxil edin"
+
+    },
+
+
+    ru:{
+
+        status:"СИСТЕМА ОНЛАЙН • БЕЗОПАСНЫЙ ДОСТУП",
+
+        heroTitle:"КОНТРОЛЬ.",
+        heroDesc:"Управляйте ботами, лицензиями и системами из одного центра. Мощная инфраструктура. Чистое управление.",
+
+        start:"Войти в систему",
+        discover:"Исследовать систему",
+
+        username:"Имя пользователя",
+        password:"Пароль",
+
+        login:"Войти",
+        register:"Регистрация",
+
+        loginTitle:"Вход в систему",
+        loginSubtitle:"Добро пожаловать в центр управления LORDSBOT.",
+
+        registerTitle:"Новый аккаунт",
+        registerSubtitle:"Присоединяйтесь к LORDSBOT.",
+
+        accountQuestion:"Нет аккаунта?",
+        accountExists:"Уже есть аккаунт?",
+
+        encrypted:"Защищённое соединение • Безопасный доступ",
+
+        float1Title:"LIVE NETWORK",
+        float1Text:"Соединение зашифровано",
+
+        float2Title:"LICENSE CORE",
+        float2Text:"Проверка активна",
+
+        featuresEyebrow:"THE CORE",
+        featuresTitle:"Это больше, чем панель.",
+        featuresDesc:"LORDSBOT создан для управления всеми системами из одного центра.",
+
+        feature1Title:"Центральное управление",
+        feature1Text:"Следите за ботами и системами из одного места.",
+
+        feature2Title:"Мгновенная синхронизация",
+        feature2Text:"Данные системы и лицензий постоянно обновляются.",
+
+        feature3Title:"Безопасность лицензий",
+        feature3Text:"Контролируйте доступ с помощью проверки лицензий.",
+
+        feature4Title:"Чистая архитектура",
+        feature4Text:"Простой, быстрый и современный интерфейс.",
+
+        feature5Title:"Система прав",
+        feature5Text:"Безопасно разделяйте доступ пользователей и администраторов.",
+
+        feature6Title:"Без ограничений",
+        feature6Text:"Панель масштабируется вместе с вашей системой.",
+
+        previewEyebrow:"CONTROL CENTER",
+        previewTitle:"Контроль у вас.",
+        previewDesc:"Мощный центр управления пользователями, лицензиями и ботами.",
+
+        preview1:"Просмотр состояния лицензий",
+        preview2:"Мониторинг активных систем",
+        preview3:"Центральное управление правами",
+        preview4:"Безопасный доступ",
+
+        securityTitle:"Система работает тихо в фоне.",
+        securityDesc:"Пока вы управляете системой, защитные слои работают в фоне.",
+
+        sec1Title:"Encrypted",
+        sec1Text:"Соединение между клиентом и сервером защищено.",
+
+        sec2Title:"Token Auth",
+        sec2Text:"Безопасная авторизация на основе токенов.",
+
+        sec3Title:"Permission",
+        sec3Text:"Права контролируются ролями пользователей.",
+
+        sec4Title:"Monitoring",
+        sec4Text:"Состояние системы можно отслеживать централизованно.",
+
+        ctaTitle:"Возьмите контроль.",
+        ctaDesc:"Безопасно подключитесь к LORDSBOT.",
+        ctaButton:"Начать",
+
+        footer:"Secure Control System",
+
+        loginSuccess:"Вход выполнен. Перенаправление в центр управления...",
+        registerSuccess:"Аккаунт создан. Теперь вы можете войти.",
+
+        loginError:"Не удалось войти.",
+        registerError:"Не удалось создать аккаунт.",
+
+        serverError:"Не удалось подключиться к серверу.\n\nУбедитесь, что backend работает на 127.0.0.1:8001.",
+
+        usernamePlaceholder:"Введите имя пользователя",
+        passwordPlaceholder:"Введите пароль"
+
+    },
+
+
+    en:{
+
+        status:"SYSTEM ONLINE • SECURE ACCESS",
+
+        heroTitle:"CONTROL.",
+        heroDesc:"Manage your bots, licenses and systems from one central command. Powerful infrastructure. Clean control.",
+
+        start:"Enter System",
+        discover:"Explore System",
+
+        username:"Username",
+        password:"Password",
+
+        login:"Sign In",
+        register:"Create Account",
+
+        loginTitle:"System Access",
+        loginSubtitle:"Welcome to the LORDSBOT control center.",
+
+        registerTitle:"New Account",
+        registerSubtitle:"Join the LORDSBOT network.",
+
+        accountQuestion:"Don't have an account?",
+        accountExists:"Already have an account?",
+
+        encrypted:"Protected connection • End-to-end secured",
+
+        float1Title:"LIVE NETWORK",
+        float1Text:"Connection encrypted",
+
+        float2Title:"LICENSE CORE",
+        float2Text:"Verification active",
+
+        featuresEyebrow:"THE CORE",
+        featuresTitle:"More than a dashboard.",
+        featuresDesc:"LORDSBOT was designed to bring your entire control system into one powerful center.",
+
+        feature1Title:"Central Control",
+        feature1Text:"Monitor all bots and system states from one place.",
+
+        feature2Title:"Live Sync",
+        feature2Text:"System information and license states stay synchronized.",
+
+        feature3Title:"License Security",
+        feature3Text:"Keep access under control with license verification.",
+
+        feature4Title:"Clean Architecture",
+        feature4Text:"No unnecessary complexity. Fast and modern control.",
+
+        feature5Title:"Permission System",
+        feature5Text:"Securely separate user and administrator access.",
+
+        feature6Title:"Unlimited Scale",
+        feature6Text:"Your control center grows together with your system.",
+
+        previewEyebrow:"CONTROL CENTER",
+        previewTitle:"You're in control.",
+        previewDesc:"A clean but powerful management experience for users, licenses and bots.",
+
+        preview1:"View license status",
+        preview2:"Monitor active systems",
+        preview3:"Manage permissions centrally",
+        preview4:"Use secure access",
+
+        securityTitle:"The system works silently in the background.",
+        securityDesc:"While you control everything, security layers keep working behind the scenes.",
+
+        sec1Title:"Encrypted",
+        sec1Text:"Communication between client and server is protected.",
+
+        sec2Title:"Token Auth",
+        sec2Text:"Sessions use secure token-based authentication.",
+
+        sec3Title:"Permission",
+        sec3Text:"Access is controlled according to user roles.",
+
+        sec4Title:"Monitoring",
+        sec4Text:"System status can be monitored centrally.",
+
+        ctaTitle:"Take control.",
+        ctaDesc:"Connect securely to the LORDSBOT system.",
+        ctaButton:"Get Started",
+
+        footer:"Secure Control System",
+
+        loginSuccess:"Login successful. Redirecting to the control center...",
+        registerSuccess:"Account created successfully. You can now sign in.",
+
+        loginError:"Login failed.",
+        registerError:"Registration failed.",
+
+        serverError:"Could not connect to the server.\n\nMake sure the backend is running on 127.0.0.1:8001.",
+
+        usernamePlaceholder:"Enter your username",
+        passwordPlaceholder:"Enter your password"
+
+    }
+
+};
+
+
+/* =========================================
+   CURRENT LANGUAGE
+========================================= */
+
+let currentLanguage =
+    localStorage.getItem("lordsbot_language") || "tr";
+
+
+const flags = {
+    az:"🇦🇿",
+    tr:"🇹🇷",
+    ru:"🇷🇺",
+    en:"🇬🇧"
+};
+
+
+const shortNames = {
+    az:"AZ",
+    tr:"TR",
+    ru:"RU",
+    en:"EN"
+};
+
+
+/* =========================================
+   TRANSLATE
+========================================= */
+
+function t(key){
+
+    return (
+        translations[currentLanguage] &&
+        translations[currentLanguage][key]
+    ) || translations.tr[key] || key;
+
+}
+
+
+/* =========================================
+   APPLY LANGUAGE
+========================================= */
+
+function applyLanguage(){
+
+    document.documentElement.lang = currentLanguage;
+
+    document.querySelectorAll("[data-i18n]").forEach(element => {
+
+        const key = element.getAttribute("data-i18n");
+
+        if(translations[currentLanguage][key]){
+            element.textContent = translations[currentLanguage][key];
+        }
+
+    });
+
+
+    document.getElementById("currentFlag").textContent =
+        flags[currentLanguage];
+
+    document.getElementById("currentLang").textContent =
+        shortNames[currentLanguage];
+
+
+    usernameInput.placeholder =
+        t("usernamePlaceholder");
+
+    passwordInput.placeholder =
+        t("passwordPlaceholder");
+
+
+    updateAuthTexts();
+
+}
+
+
+/* =========================================
+   AUTH TEXT
+========================================= */
+
+function updateAuthTexts(){
+
+    if(registerMode){
+
+        authTitle.textContent = t("registerTitle");
+        authSubtitle.textContent = t("registerSubtitle");
+
+        submitText.textContent = t("register");
+
+        switchText.textContent = t("accountExists");
+        switchButton.textContent = t("login");
+
+        passwordInput.autocomplete = "new-password";
+
+    }else{
+
+        authTitle.textContent = t("loginTitle");
+        authSubtitle.textContent = t("loginSubtitle");
+
+        submitText.textContent = t("login");
+
+        switchText.textContent = t("accountQuestion");
+        switchButton.textContent = t("register");
+
+        passwordInput.autocomplete = "current-password";
+
+    }
+
+}
+
+
+/* =========================================
+   LANGUAGE MENU
+========================================= */
+
+const langButton = document.getElementById("langButton");
+const langMenu = document.getElementById("langMenu");
+
+langButton.addEventListener("click", function(e){
+
+    e.stopPropagation();
+
+    langMenu.classList.toggle("active");
+
+});
+
+
+document.querySelectorAll(".lang-option").forEach(option => {
+
+    option.addEventListener("click", function(){
+
+        const lang = this.dataset.lang;
+
+        currentLanguage = lang;
+
+        localStorage.setItem(
+            "lordsbot_language",
+            currentLanguage
+        );
+
+        applyLanguage();
+
+        langMenu.classList.remove("active");
+
+    });
+
+});
+
+
+document.addEventListener("click", function(){
+
+    langMenu.classList.remove("active");
+
+});
+
+
+/* =========================================
+   AUTH SWITCH
+========================================= */
+
+switchButton.addEventListener("click", function(){
+
+    registerMode = !registerMode;
+
+    clearMessage();
+
+    authForm.reset();
+
+    updateAuthTexts();
+
+    window.scrollTo({
+        top:document.getElementById("auth").offsetTop - 100,
+        behavior:"smooth"
+    });
+
+});
+
+
+/* =========================================
+   MESSAGE
+========================================= */
+
+function showMessage(text,type){
+
+    message.textContent = text;
+
+    message.className =
+        "message show " + type;
+
+}
+
+
+function clearMessage(){
+
+    message.textContent = "";
+
+    message.className = "message";
+
+}
+
+
+/* =========================================
+   RESPONSE PARSER
+========================================= */
+
+async function parseResponse(response){
+
+    const rawText = await response.text();
+
+    if(!rawText){
+        return {};
+    }
+
+    try{
+
+        return JSON.parse(rawText);
+
+    }catch{
+
+        return {
+            detail:rawText
+        };
+
+    }
+
+}
+
+
+/* =========================================
+   ERROR PARSER
+========================================= */
+
+function getErrorMessage(data,fallback){
+
+    if(!data){
+        return fallback;
+    }
+
+
+    const detail = data.detail;
+
+
+    if(typeof detail === "string"){
+        return detail;
+    }
+
+
+    if(Array.isArray(detail)){
+
+        return detail.map(item => {
+
+            if(typeof item === "string"){
+                return item;
+            }
+
+            if(item && item.msg){
+                return item.msg;
+            }
+
+            if(item && item.message){
+                return item.message;
+            }
+
+            return JSON.stringify(item);
+
+        }).join("\n");
+
+    }
+
+
+    if(detail && typeof detail === "object"){
+
+        return (
+            detail.msg ||
+            detail.message ||
+            detail.error ||
+            detail.detail ||
+            JSON.stringify(detail)
+        );
+
+    }
+
+
+    if(typeof data.message === "string"){
+        return data.message;
+    }
+
+
+    if(typeof data.error === "string"){
+        return data.error;
+    }
+
+
+    return fallback;
+
+}
+
+
+/* =========================================
+   AUTH SUBMIT
+========================================= */
+
+authForm.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    clearMessage();
+
+    const username =
+        usernameInput.value.trim();
+
+    const password =
+        passwordInput.value;
+
+
+    if(!username || !password){
+
+        showMessage(
+            currentLanguage === "tr"
+                ? "Kullanıcı adı ve şifre gerekli."
+                : currentLanguage === "az"
+                    ? "İstifadəçi adı və şifrə tələb olunur."
+                    : currentLanguage === "ru"
+                        ? "Имя пользователя и пароль обязательны."
+                        : "Username and password are required.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    submitButton.disabled = true;
+
+    submitText.textContent = "•••";
+
+
+    try{
+
+        let response;
+        let data;
+
+
+        /* =========================
+           REGISTER
+        ========================= */
+
+        if(registerMode){
+
+            response = await fetch(
+                API_URL + "/api/auth/register",
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        username:username,
+                        password:password
+
+                    })
+
+                }
+            );
+
+
+            data = await parseResponse(response);
+
+
+            if(!response.ok){
+
+                throw new Error(
+                    getErrorMessage(
+                        data,
+                        t("registerError")
+                    )
+                );
+
+            }
+
+
+            showMessage(
+                t("registerSuccess"),
+                "success"
+            );
+
+
+            /* KAYITTAN SONRA LOGIN MODUNA GEÇ */
+
+            setTimeout(function(){
+
+                registerMode = false;
+
+                updateAuthTexts();
+
+                clearMessage();
+
+                usernameInput.value = username;
+                passwordInput.value = "";
+
+                submitButton.disabled = false;
+
+                submitText.textContent = t("login");
+
+            },1200);
+
+
+            return;
+
+        }
+
+
+        /* =========================
+           LOGIN
+        ========================= */
+
+        response = await fetch(
+            API_URL + "/api/auth/login",
+            {
+                method:"POST",
+
+           headers:{
+    "Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+    username:username,
+    password:password
+
+})
+
+            }
+        );
+
+
+        data = await parseResponse(response);
+
+
+        if(!response.ok){
+
+            throw new Error(
+                getErrorMessage(
+                    data,
+                    t("loginError")
+                )
+            );
+
+        }
+
+
+        /* =========================
+           SAVE SESSION
+        ========================= */
+
+        if(data.access_token){
+
+            localStorage.setItem(
+                "access_token",
+                data.access_token
+            );
+
+        }
+
+
+        if(data.username){
+
+            localStorage.setItem(
+                "username",
+                data.username
+            );
+
+        }else{
+
+            localStorage.setItem(
+                "username",
+                username
+            );
+
+        }
+
+
+        if(data.is_admin !== undefined){
+
+            localStorage.setItem(
+                "is_admin",
+                String(data.is_admin)
+            );
+
+        }
+
+
+        submitButton.disabled = true;
+
+        submitText.textContent = "✓";
+
+
+        showMessage(
+            t("loginSuccess"),
+            "success"
+        );
+
+
+        setTimeout(function(){
+
+            window.location.href =
+                "dashboard.html";
+
+        },700);
+
+
+    }catch(error){
+
+        console.error(error);
+
+
+        let errorText =
+            error.message ||
+            t("loginError");
+
+
+        if(
+            errorText === "Failed to fetch" ||
+            errorText.includes("NetworkError") ||
+            errorText.includes("Load failed")
+        ){
+
+            errorText = t("serverError");
+
+        }
+
+
+        showMessage(
+            errorText,
+            "error"
+        );
+
+
+        submitButton.disabled = false;
+
+        updateAuthTexts();
+
+    }
+
+});
+
+
+/* =========================================
+   SCROLL
+========================================= */
+
+function scrollToAuth(){
+
+    document.getElementById("auth").scrollIntoView({
+        behavior:"smooth",
+        block:"center"
+    });
+
+}
+
+
+function scrollToFeatures(){
+
+    document.getElementById("features").scrollIntoView({
+        behavior:"smooth"
+    });
+
+}
+
+
+/* =========================================
+   CURSOR GLOW
+========================================= */
+
+const cursorGlow =
+    document.getElementById("cursorGlow");
+
+
+document.addEventListener("mousemove",function(e){
+
+    cursorGlow.style.left =
+        e.clientX + "px";
+
+    cursorGlow.style.top =
+        e.clientY + "px";
+
+});
+
+
+/* =========================================
+   INIT
+========================================= */
+
+applyLanguage();
+
+</script>
+
+</body>
+</html>

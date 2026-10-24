@@ -1,0 +1,4225 @@
+```html
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LORDSBOT — Control Center</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --bg:#050609;
+    --bg2:#080a10;
+    --panel:rgba(13,16,24,.78);
+    --panel2:rgba(18,22,32,.88);
+    --line:rgba(255,255,255,.075);
+    --text:#f4f7fb;
+    --muted:#8992a4;
+    --accent:#8b5cf6;
+    --accent2:#6366f1;
+    --green:#35e59a;
+    --red:#ff5577;
+    --orange:#ffad5a;
+    --cyan:#42d9ff;
+    --shadow:0 25px 80px rgba(0,0,0,.45);
+}
+
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 10% 0%,rgba(99,102,241,.14),transparent 28%),
+        radial-gradient(circle at 90% 10%,rgba(139,92,246,.13),transparent 25%),
+        radial-gradient(circle at 50% 100%,rgba(66,217,255,.06),transparent 30%),
+        var(--bg);
+    color:var(--text);
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+    overflow-x:hidden;
+}
+
+body:before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.18;
+    background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+    background-size:50px 50px;
+    mask-image:linear-gradient(to bottom,black,transparent);
+}
+
+body:after{
+    content:"";
+    position:fixed;
+    width:600px;
+    height:600px;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(139,92,246,.10),transparent 68%);
+    left:50%;
+    top:35%;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+    filter:blur(20px);
+}
+
+button,input,select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.app{
+    display:flex;
+    min-height:100vh;
+    position:relative;
+    z-index:2;
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar{
+    width:270px;
+    min-height:100vh;
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    background:rgba(5,7,11,.82);
+    backdrop-filter:blur(28px);
+    border-right:1px solid var(--line);
+    padding:24px 15px;
+    z-index:20;
+    overflow-y:auto;
+}
+
+.brand{
+    padding:4px 13px 28px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:18px;
+    cursor:pointer;
+}
+
+.brand-name{
+    font-size:23px;
+    font-weight:900;
+    letter-spacing:5px;
+}
+
+.brand-sub{
+    color:#737c8e;
+    font-size:9px;
+    letter-spacing:3px;
+    margin-top:6px;
+}
+
+.nav-label{
+    color:#555e70;
+    font-size:9px;
+    letter-spacing:2px;
+    font-weight:800;
+    margin:20px 12px 9px;
+}
+
+.nav-item{
+    width:100%;
+    border:1px solid transparent;
+    background:transparent;
+    color:#8f98aa;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 13px;
+    border-radius:12px;
+    margin-bottom:4px;
+    text-align:left;
+    transition:.22s ease;
+}
+
+.nav-item:hover{
+    color:white;
+    background:rgba(255,255,255,.035);
+    border-color:var(--line);
+    transform:translateX(2px);
+}
+
+.nav-item.active{
+    color:white;
+    background:
+        linear-gradient(100deg,rgba(139,92,246,.17),rgba(99,102,241,.05));
+    border-color:rgba(139,92,246,.25);
+    box-shadow:inset 3px 0 0 var(--accent);
+}
+
+.nav-icon{
+    width:30px;
+    height:30px;
+    display:grid;
+    place-items:center;
+    font-size:17px;
+    background:rgba(255,255,255,.035);
+    border-radius:9px;
+}
+
+.nav-text{
+    font-size:12px;
+    font-weight:700;
+}
+
+.nav-status{
+    margin-left:auto;
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:#3b4351;
+}
+
+.nav-item.active .nav-status{
+    background:var(--green);
+    box-shadow:0 0 10px var(--green);
+}
+
+.sidebar-bottom{
+    margin-top:24px;
+    padding:14px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:rgba(255,255,255,.025);
+}
+
+.sidebar-user{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.avatar{
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    display:grid;
+    place-items:center;
+    background:linear-gradient(135deg,#7c3aed,#4f46e5);
+    font-weight:900;
+    font-size:13px;
+}
+
+.user-name{
+    font-size:11px;
+    font-weight:800;
+}
+
+.user-role{
+    font-size:9px;
+    color:#6d7688;
+    margin-top:2px;
+}
+
+.logout-btn{
+    width:100%;
+    margin-top:12px;
+    padding:9px;
+    border-radius:9px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:#788193;
+    font-size:10px;
+    font-weight:800;
+}
+
+.logout-btn:hover{
+    color:#ff6b88;
+    border-color:rgba(255,85,119,.25);
+}
+
+/* ================= MAIN ================= */
+
+.main{
+    width:calc(100% - 270px);
+    margin-left:270px;
+    padding:26px 32px 60px;
+}
+
+.topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:28px;
+}
+
+.breadcrumb{
+    color:#626b7c;
+    font-size:10px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+}
+
+.breadcrumb span{
+    color:#aab2c0;
+}
+
+.top-actions{
+    display:flex;
+    gap:9px;
+}
+
+.top-btn{
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.025);
+    color:#8e97a9;
+    border-radius:10px;
+    padding:9px 12px;
+    font-size:10px;
+    font-weight:800;
+}
+
+.top-btn:hover{
+    color:white;
+    background:rgba(255,255,255,.05);
+}
+
+/* ================= HERO ================= */
+
+.hero{
+    position:relative;
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding:32px;
+    min-height:205px;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 85% 30%,rgba(139,92,246,.18),transparent 32%),
+        linear-gradient(135deg,rgba(18,21,31,.96),rgba(8,10,15,.92));
+    box-shadow:var(--shadow);
+    margin-bottom:18px;
+}
+
+.hero:after{
+    content:"";
+    position:absolute;
+    width:360px;
+    height:360px;
+    right:-150px;
+    top:-170px;
+    border:1px solid rgba(139,92,246,.15);
+    border-radius:50%;
+    box-shadow:
+        0 0 0 35px rgba(139,92,246,.025),
+        0 0 0 70px rgba(139,92,246,.018),
+        0 0 0 105px rgba(139,92,246,.012);
+}
+
+.hero-kicker{
+    color:#9b7cff;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:3px;
+    margin-bottom:9px;
+}
+
+.hero h1{
+    font-size:38px;
+    letter-spacing:-1.8px;
+    font-weight:900;
+}
+
+.hero h1 span{
+    color:#9d7aff;
+}
+
+.hero p{
+    color:#7e8798;
+    font-size:12px;
+    margin-top:9px;
+    max-width:580px;
+    line-height:1.7;
+}
+
+.hero-status{
+    position:absolute;
+    right:30px;
+    bottom:28px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:9px;
+    letter-spacing:1.5px;
+    color:#9aa3b3;
+}
+
+.status-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 14px var(--green);
+    animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:.5;transform:scale(.75)}
+}
+
+/* ================= STAT GRID ================= */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.stat{
+    padding:17px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    backdrop-filter:blur(20px);
+    border-radius:16px;
+    transition:.25s;
+}
+
+.stat:hover{
+    transform:translateY(-3px);
+    border-color:rgba(139,92,246,.25);
+}
+
+.stat-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.stat-icon{
+    font-size:17px;
+}
+
+.stat-label{
+    color:#70798b;
+    font-size:9px;
+    letter-spacing:1.2px;
+    font-weight:800;
+}
+
+.stat-value{
+    margin-top:10px;
+    font-size:19px;
+    font-weight:900;
+}
+
+.stat-small{
+    margin-top:4px;
+    color:#616a7b;
+    font-size:9px;
+}
+
+/* ================= SECTIONS ================= */
+
+.section{
+    display:none;
+    animation:sectionIn .35s ease;
+}
+
+.section.active{
+    display:block;
+}
+
+@keyframes sectionIn{
+    from{
+        opacity:0;
+        transform:translateY(8px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.section-title{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    margin:24px 0 14px;
+}
+
+.section-title-icon{
+    width:43px;
+    height:43px;
+    border-radius:13px;
+    display:grid;
+    place-items:center;
+    background:linear-gradient(135deg,rgba(139,92,246,.18),rgba(99,102,241,.07));
+    border:1px solid rgba(139,92,246,.2);
+    font-size:21px;
+}
+
+.section-title h2{
+    font-size:18px;
+    letter-spacing:-.5px;
+}
+
+.section-title p{
+    color:#687184;
+    font-size:10px;
+    margin-top:3px;
+}
+
+/* ================= CARDS ================= */
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+}
+
+.grid.three{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.card{
+    border:1px solid var(--line);
+    background:var(--panel);
+    backdrop-filter:blur(22px);
+    border-radius:17px;
+    padding:19px;
+    box-shadow:0 15px 50px rgba(0,0,0,.18);
+}
+
+.card:hover{
+    border-color:rgba(255,255,255,.11);
+}
+
+.card.full{
+    grid-column:1/-1;
+}
+
+.card-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:18px;
+}
+
+.card-head-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.card-icon{
+    width:34px;
+    height:34px;
+    display:grid;
+    place-items:center;
+    border-radius:10px;
+    background:rgba(255,255,255,.04);
+    font-size:17px;
+}
+
+.card-title{
+    font-size:12px;
+    font-weight:900;
+}
+
+.card-desc{
+    color:#626b7b;
+    font-size:9px;
+    margin-top:3px;
+}
+
+.toggle{
+    width:39px;
+    height:21px;
+    border-radius:30px;
+    background:#252b36;
+    border:1px solid rgba(255,255,255,.07);
+    position:relative;
+    cursor:pointer;
+}
+
+.toggle:after{
+    content:"";
+    width:15px;
+    height:15px;
+    position:absolute;
+    top:2px;
+    left:3px;
+    border-radius:50%;
+    background:#70798a;
+    transition:.2s;
+}
+
+.toggle.on{
+    background:rgba(53,229,154,.16);
+    border-color:rgba(53,229,154,.3);
+}
+
+.toggle.on:after{
+    left:19px;
+    background:var(--green);
+    box-shadow:0 0 10px rgba(53,229,154,.55);
+}
+
+/* ================= FORM ================= */
+
+.setting{
+    margin-bottom:13px;
+}
+
+.setting:last-child{
+    margin-bottom:0;
+}
+
+.setting-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+}
+
+.setting-name{
+    color:#b7bfcc;
+    font-size:10px;
+    font-weight:700;
+}
+
+.setting-note{
+    color:#596273;
+    font-size:8px;
+    margin-top:3px;
+}
+
+select,
+input[type="number"],
+input[type="text"]{
+    background:#0b0e15;
+    border:1px solid rgba(255,255,255,.08);
+    color:#dce1e9;
+    border-radius:9px;
+    padding:8px 10px;
+    outline:none;
+    font-size:10px;
+    min-width:130px;
+}
+
+select:focus,
+input:focus{
+    border-color:rgba(139,92,246,.5);
+    box-shadow:0 0 0 3px rgba(139,92,246,.08);
+}
+
+.checkbox-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:7px;
+}
+
+.check{
+    border:1px solid rgba(255,255,255,.06);
+    background:rgba(255,255,255,.025);
+    padding:10px;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#8f98a9;
+    font-size:9px;
+    cursor:pointer;
+    transition:.18s;
+}
+
+.check:hover{
+    border-color:rgba(139,92,246,.22);
+    color:#d9dfea;
+}
+
+.check input{
+    accent-color:#8b5cf6;
+}
+
+.range-wrap{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+input[type="range"]{
+    flex:1;
+    accent-color:#8b5cf6;
+}
+
+.range-value{
+    min-width:35px;
+    text-align:center;
+    color:#a88cff;
+    font-size:10px;
+    font-weight:900;
+}
+
+/* ================= PRIORITY ================= */
+
+.priority{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.priority-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border:1px solid rgba(255,255,255,.06);
+    background:rgba(255,255,255,.025);
+    padding:10px 12px;
+    border-radius:10px;
+    cursor:grab;
+    user-select:none;
+    transition:.2s;
+}
+
+.priority-item:active{
+    cursor:grabbing;
+}
+
+.priority-item.dragging{
+    opacity:.35;
+    border-color:#8b5cf6;
+}
+
+.drag{
+    color:#555f70;
+    font-size:14px;
+}
+
+.rank{
+    width:21px;
+    height:21px;
+    border-radius:7px;
+    display:grid;
+    place-items:center;
+    background:rgba(139,92,246,.12);
+    color:#aa8aff;
+    font-size:9px;
+    font-weight:900;
+}
+
+.resource-name{
+    font-size:10px;
+    color:#c4cbd6;
+    font-weight:700;
+}
+
+/* ================= BUTTONS ================= */
+
+.btn{
+    border:1px solid rgba(139,92,246,.3);
+    background:linear-gradient(135deg,rgba(139,92,246,.22),rgba(99,102,241,.10));
+    color:#e8e4ff;
+    border-radius:10px;
+    padding:10px 15px;
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:.6px;
+    transition:.2s;
+}
+
+.btn:hover{
+    transform:translateY(-2px);
+    border-color:rgba(139,92,246,.55);
+    box-shadow:0 8px 25px rgba(99,102,241,.14);
+}
+
+.btn.green{
+    border-color:rgba(53,229,154,.25);
+    background:rgba(53,229,154,.08);
+    color:#65efb0;
+}
+
+.btn.red{
+    border-color:rgba(255,85,119,.25);
+    background:rgba(255,85,119,.07);
+    color:#ff7895;
+}
+
+.btn-row{
+    display:flex;
+    gap:8px;
+    margin-top:16px;
+}
+
+/* ================= CHIPS ================= */
+
+.chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+}
+
+.chip{
+    padding:7px 10px;
+    border:1px solid rgba(255,255,255,.07);
+    background:rgba(255,255,255,.025);
+    border-radius:8px;
+    color:#798294;
+    font-size:9px;
+    cursor:pointer;
+    transition:.18s;
+}
+
+.chip.active{
+    border-color:rgba(139,92,246,.35);
+    color:#c6b6ff;
+    background:rgba(139,92,246,.11);
+}
+
+/* ================= LICENSE ================= */
+
+.license-core{
+    position:relative;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 90% 20%,rgba(139,92,246,.18),transparent 35%),
+        linear-gradient(135deg,#111520,#090c13);
+}
+
+.license-core:after{
+    content:"";
+    position:absolute;
+    width:180px;
+    height:180px;
+    border:1px solid rgba(139,92,246,.12);
+    border-radius:50%;
+    right:-70px;
+    bottom:-80px;
+}
+
+.license-status{
+    color:#63edaa;
+    font-size:9px;
+    letter-spacing:1px;
+    font-weight:900;
+}
+
+.license-days{
+    font-size:42px;
+    font-weight:950;
+    margin-top:15px;
+}
+
+.license-days span{
+    color:#70798b;
+    font-size:11px;
+    font-weight:700;
+}
+
+.license-key{
+    margin-top:17px;
+    color:#666f80;
+    font-size:8px;
+    letter-spacing:1.4px;
+}
+
+.license-key strong{
+    color:#aeb6c5;
+    font-size:10px;
+    letter-spacing:1px;
+}
+
+/* ================= INFO ================= */
+
+.info-line{
+    display:flex;
+    justify-content:space-between;
+    padding:11px 0;
+    border-bottom:1px solid rgba(255,255,255,.045);
+}
+
+.info-line:last-child{
+    border-bottom:0;
+}
+
+.info-line span:first-child{
+    color:#697284;
+    font-size:9px;
+}
+
+.info-line span:last-child{
+    color:#c5ccd8;
+    font-size:9px;
+    font-weight:800;
+}
+
+.green-text{
+    color:var(--green)!important;
+}
+
+.orange-text{
+    color:var(--orange)!important;
+}
+
+/* ================= BOT CORE ================= */
+
+.bot-core{
+    min-height:260px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.bot-state{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.core-orb{
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background:radial-gradient(circle,rgba(139,92,246,.35),rgba(139,92,246,.04) 65%);
+    border:1px solid rgba(139,92,246,.28);
+    box-shadow:0 0 35px rgba(139,92,246,.14);
+    font-size:21px;
+}
+
+.bot-state strong{
+    font-size:14px;
+}
+
+.bot-state small{
+    display:block;
+    color:#657083;
+    font-size:9px;
+    margin-top:3px;
+}
+
+.current-task{
+    margin-top:20px;
+    padding:15px;
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:12px;
+    background:rgba(255,255,255,.02);
+}
+
+.current-task label{
+    display:block;
+    color:#5f6879;
+    font-size:8px;
+    letter-spacing:1.4px;
+    margin-bottom:8px;
+}
+
+.current-task div{
+    color:#cbd2dc;
+    font-size:11px;
+    font-weight:800;
+}
+
+/* ================= TOAST ================= */
+
+.toast{
+    position:fixed;
+    right:25px;
+    bottom:25px;
+    min-width:250px;
+    max-width:370px;
+    padding:14px 16px;
+    border:1px solid rgba(139,92,246,.3);
+    border-radius:13px;
+    background:rgba(11,14,21,.94);
+    backdrop-filter:blur(20px);
+    box-shadow:var(--shadow);
+    color:#d8deea;
+    font-size:10px;
+    z-index:100;
+    transform:translateY(120px);
+    opacity:0;
+    transition:.3s;
+}
+
+.toast.show{
+    transform:translateY(0);
+    opacity:1;
+}
+
+.toast strong{
+    display:block;
+    color:white;
+    margin-bottom:4px;
+}
+
+/* ================= MOBILE ================= */
+
+.mobile-top{
+    display:none;
+}
+
+@media(max-width:1000px){
+    .sidebar{
+        width:220px;
+    }
+
+    .main{
+        margin-left:220px;
+        width:calc(100% - 220px);
+        padding:22px;
+    }
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:760px){
+    .sidebar{
+        display:none;
+    }
+
+    .main{
+        margin-left:0;
+        width:100%;
+        padding:15px;
+    }
+
+    .grid,
+    .grid.three{
+        grid-template-columns:1fr;
+    }
+
+    .stats{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .hero{
+        padding:23px;
+    }
+
+    .hero h1{
+        font-size:28px;
+    }
+
+    .hero-status{
+        position:static;
+        margin-top:22px;
+    }
+
+    .mobile-top{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:18px;
+    }
+
+    .mobile-brand{
+        font-weight:950;
+        letter-spacing:3px;
+        font-size:15px;
+    }
+
+    .mobile-select{
+        background:#0b0e15;
+        color:#aeb6c5;
+        border:1px solid var(--line);
+        border-radius:8px;
+        padding:7px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside class="sidebar">
+
+    <div class="brand" onclick="goHome()">
+        <div class="brand-name">LORDSBOT</div>
+        <div class="brand-sub">CONTROL CENTER</div>
+    </div>
+
+    <div class="nav-label">CORE</div>
+
+    <button class="nav-item active" data-section="overview" onclick="openSection('overview',this)">
+        <span class="nav-icon">◈</span>
+        <span class="nav-text">Genel Bakış</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <button class="nav-item" data-section="gather" onclick="openSection('gather',this)">
+        <span class="nav-icon">🗺️</span>
+        <span class="nav-text">Kaynak Toplama</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <button class="nav-item" data-section="protection" onclick="openSection('protection',this)">
+        <span class="nav-icon">🛡️</span>
+        <span class="nav-text">Koruma</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <button class="nav-item" data-section="support" onclick="openSection('support',this)">
+        <span class="nav-icon">🤝</span>
+        <span class="nav-text">Krallık Desteği</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <button class="nav-item" data-section="mirage" onclick="openSection('mirage',this)">
+        <span class="nav-icon">🌫️</span>
+        <span class="nav-text">Serap Diyarı</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <button class="nav-item" data-section="rally" onclick="openSection('rally',this)">
+        <span class="nav-icon">⚔️</span>
+        <span class="nav-text">İctimaa</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <button class="nav-item" data-section="monster" onclick="openSection('monster',this)">
+        <span class="nav-icon">👹</span>
+        <span class="nav-text">Canavar</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <button class="nav-item" data-section="cargo" onclick="openSection('cargo',this)">
+        <span class="nav-icon">🚢</span>
+        <span class="nav-text">Kargo Gemisi</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <div class="nav-label">DEVELOPMENT</div>
+
+    <button class="nav-item" data-section="building" onclick="openSection('building',this)">
+        <span class="nav-icon">🏗️</span>
+        <span class="nav-text">İnşaat</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <button class="nav-item" data-section="research" onclick="openSection('research',this)">
+        <span class="nav-icon">🔬</span>
+        <span class="nav-text">Araştırma</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <button class="nav-item" data-section="army" onclick="openSection('army',this)">
+        <span class="nav-icon">🪖</span>
+        <span class="nav-text">Ordu Eğitimi</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <button class="nav-item" data-section="heroes" onclick="openSection('heroes',this)">
+        <span class="nav-icon">🦸</span>
+        <span class="nav-text">Kahramanlar</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <button class="nav-item" data-section="equipment" onclick="openSection('equipment',this)">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-text">Ekipman</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <button class="nav-item" data-section="familiars" onclick="openSection('familiars',this)">
+        <span class="nav-icon">🐲</span>
+        <span class="nav-text">Yoldaşlar</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <div class="nav-label">SYSTEM</div>
+
+    <button class="nav-item" data-section="bank" onclick="openSection('bank',this)">
+        <span class="nav-icon">🏦</span>
+        <span class="nav-text">Banka</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <button class="nav-item" data-section="session" onclick="openSection('session',this)">
+        <span class="nav-icon">🔄</span>
+        <span class="nav-text">Oturum</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <button class="nav-item" data-section="general" onclick="openSection('general',this)">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-text">Genel Ayarlar</span>
+        <span class="nav-status"></span>
+    </button>
+
+    <div class="sidebar-bottom">
+        <div class="sidebar-user">
+            <div class="avatar" id="avatar">U</div>
+            <div>
+                <div class="user-name" id="sideUsername">USER</div>
+                <div class="user-role">LICENSED OPERATOR</div>
+            </div>
+        </div>
+        <button class="logout-btn" onclick="logout()">ÇIKIŞ YAP</button>
+    </div>
+
+</aside>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="main">
+
+    <div class="mobile-top">
+        <div class="mobile-brand">LORDSBOT</div>
+        <select class="mobile-select" onchange="mobileNavigate(this.value)">
+            <option value="overview">Dashboard</option>
+            <option value="gather">🗺️ Kaynak</option>
+            <option value="protection">🛡️ Koruma</option>
+            <option value="monster">👹 Canavar</option>
+            <option value="building">🏗️ İnşaat</option>
+            <option value="research">🔬 Araştırma</option>
+            <option value="army">🪖 Ordu</option>
+            <option value="heroes">🦸 Kahraman</option>
+            <option value="equipment">⚙️ Ekipman</option>
+            <option value="familiars">🐲 Yoldaş</option>
+            <option value="bank">🏦 Banka</option>
+        </select>
+    </div>
+
+    <div class="topbar">
+        <div class="breadcrumb">
+            LORDSBOT / <span id="breadcrumb">DASHBOARD</span>
+        </div>
+
+        <div class="top-actions">
+            <button class="top-btn" onclick="saveAll()">💾 KAYDET</button>
+            <button class="top-btn" onclick="showToast('Sistem','Tüm ayarlar kaydedildi.')">✓ SYSTEM READY</button>
+        </div>
+    </div>
+
+
+<!-- ================= HERO ================= -->
+
+<div class="hero">
+
+    <div class="hero-kicker">LORDSMOBILE AUTOMATION CONTROL</div>
+
+    <h1>
+        WELCOME BACK,
+        <span id="heroUsername">OPERATOR</span>
+    </h1>
+
+    <p>
+        Bot davranışını tek merkezden yönet.
+        Her modül bağımsız yapılandırılabilir ve tüm ayarlar
+        gerçek bot entegrasyonuna hazır şekilde saklanır.
+    </p>
+
+    <div class="hero-status">
+        <span class="status-dot"></span>
+        SYSTEM OPERATIONAL
+    </div>
+
+</div>
+
+
+<!-- ================= STATS ================= -->
+
+<div class="stats">
+
+    <div class="stat">
+        <div class="stat-top">
+            <span class="stat-label">LICENSE</span>
+            <span class="stat-icon">🔑</span>
+        </div>
+        <div class="stat-value" id="statLicense">ACTIVE</div>
+        <div class="stat-small">License verification</div>
+    </div>
+
+    <div class="stat">
+        <div class="stat-top">
+            <span class="stat-label">BOT STATUS</span>
+            <span class="stat-icon">🤖</span>
+        </div>
+        <div class="stat-value" id="statBot">IDLE</div>
+        <div class="stat-small">Automation engine</div>
+    </div>
+
+    <div class="stat">
+        <div class="stat-top">
+            <span class="stat-label">DEVICE</span>
+            <span class="stat-icon">💻</span>
+        </div>
+        <div class="stat-value">VERIFIED</div>
+        <div class="stat-small">Device binding</div>
+    </div>
+
+    <div class="stat">
+        <div class="stat-top">
+            <span class="stat-label">CONFIG</span>
+            <span class="stat-icon">⚙️</span>
+        </div>
+        <div class="stat-value" id="configCount">0</div>
+        <div class="stat-small">Configured modules</div>
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     OVERVIEW
+========================================================= -->
+
+<section id="overview" class="section active">
+
+    <div class="section-title">
+        <div class="section-title-icon">◈</div>
+        <div>
+            <h2>Kontrol Merkezi</h2>
+            <p>Botun genel durumunu ve lisans bilgilerini yönet.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card license-core">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🔑</div>
+                    <div>
+                        <div class="card-title">LİSANS ÇEKİRDEĞİ</div>
+                        <div class="card-desc">License security module</div>
+                    </div>
+                </div>
+
+                <div class="license-status">● ACTIVE</div>
+            </div>
+
+            <div class="license-days">
+                <span id="daysLeft">--</span>
+                <span>GÜN KALDI</span>
+            </div>
+
+            <div class="license-key">
+                LICENSE KEY<br>
+                <strong id="licenseKey">YÜKLENİYOR...</strong>
+            </div>
+
+        </div>
+
+
+        <div class="card bot-core">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🤖</div>
+                    <div>
+                        <div class="card-title">BOT CORE</div>
+                        <div class="card-desc">Automation engine</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bot-state">
+                <div class="core-orb">◉</div>
+                <div>
+                    <strong id="botStateText">BOT BEKLEMEDE</strong>
+                    <small>Gerçek bot bağlantısı hazır olduğunda burada çalışacaktır.</small>
+                </div>
+            </div>
+
+            <div class="current-task">
+                <label>CURRENT TASK</label>
+                <div id="currentTask">Bekliyor — görev seçilmedi</div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn green" onclick="startBot()">▶ BOTU BAŞLAT</button>
+                <button class="btn red" onclick="stopBot()">■ DURDUR</button>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">💻</div>
+                    <div>
+                        <div class="card-title">CİHAZ</div>
+                        <div class="card-desc">Device security</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-line">
+                <span>Durum</span>
+                <span class="green-text">VERIFIED</span>
+            </div>
+
+            <div class="info-line">
+                <span>Device Lock</span>
+                <span>ENABLED</span>
+            </div>
+
+            <div class="info-line">
+                <span>Connection</span>
+                <span class="green-text">SECURE</span>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">👤</div>
+                    <div>
+                        <div class="card-title">HESAP</div>
+                        <div class="card-desc">Operator information</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-line">
+                <span>Kullanıcı</span>
+                <span id="accountUsername">---</span>
+            </div>
+
+            <div class="info-line">
+                <span>Account Status</span>
+                <span class="green-text">ACTIVE</span>
+            </div>
+
+            <div class="info-line">
+                <span>Access</span>
+                <span>LICENSED</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     GATHERING
+========================================================= -->
+
+<section id="gather" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">🗺️</div>
+        <div>
+            <h2>Kaynak Toplama</h2>
+            <p>Haritadaki kaynak toplama davranışını tamamen özelleştir.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🗺️</div>
+                    <div>
+                        <div class="card-title">TOPLAMA MOTORU</div>
+                        <div class="card-desc">Resource gathering control</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" data-setting="gatherEnabled" onclick="toggleSetting(this,'gatherEnabled')"></div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Maksimum kol sayısı</div>
+                        <div class="setting-note">Aynı anda kullanılabilecek toplam kol</div>
+                    </div>
+                    <select data-setting="maxGatherArmies">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option selected>5</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Boş bırakılacak kol</div>
+                        <div class="setting-note">Savunma / diğer işler için ayrılacak</div>
+                    </div>
+                    <select data-setting="spareGatherArmies">
+                        <option>0</option>
+                        <option selected>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Ordu seçimi</div>
+                        <div class="setting-note">Kaynağa gönderilecek ordu</div>
+                    </div>
+                    <select data-setting="gatherArmyMode">
+                        <option selected>En uygun ordu</option>
+                        <option>En güçlü ordu</option>
+                        <option>Manuel ordu</option>
+                        <option>En düşük ordu</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" data-setting="regather">
+                    Toplama bitince otomatik yeniden gönder
+                </label>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">⛏️</div>
+                    <div>
+                        <div class="card-title">KAYNAK SEVİYESİ</div>
+                        <div class="card-desc">Target tile levels</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkbox-grid">
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="tile1"> Lv.1
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="tile2"> Lv.2
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="tile3"> Lv.3
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="tile4"> Lv.4
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="tile5"> Lv.5
+                </label>
+
+            </div>
+
+            <div class="setting" style="margin-top:15px;">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Toplama hızı tercihi</div>
+                        <div class="setting-note">En hızlı / normal / kaynak miktarı</div>
+                    </div>
+
+                    <select data-setting="gatherPriorityMode">
+                        <option selected>En hızlı</option>
+                        <option>En fazla kaynak</option>
+                        <option>Dengeli</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="card full">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🥇</div>
+                    <div>
+                        <div class="card-title">KAYNAK ÖNCELİĞİ</div>
+                        <div class="card-desc">
+                            Kaynakları mouse ile sürükleyerek sıralamayı değiştirebilirsin.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="priority" id="resourcePriority">
+
+                <div class="priority-item" draggable="true" data-resource="gold">
+                    <span class="drag">☷</span>
+                    <span class="rank">1</span>
+                    <span class="resource-name">🪙 ALTIN</span>
+                </div>
+
+                <div class="priority-item" draggable="true" data-resource="ore">
+                    <span class="drag">☷</span>
+                    <span class="rank">2</span>
+                    <span class="resource-name">⛏️ CEVHER</span>
+                </div>
+
+                <div class="priority-item" draggable="true" data-resource="stone">
+                    <span class="drag">☷</span>
+                    <span class="rank">3</span>
+                    <span class="resource-name">🪨 TAŞ</span>
+                </div>
+
+                <div class="priority-item" draggable="true" data-resource="wood">
+                    <span class="drag">☷</span>
+                    <span class="rank">4</span>
+                    <span class="resource-name">🌲 KERESTE</span>
+                </div>
+
+                <div class="priority-item" draggable="true" data-resource="food">
+                    <span class="drag">☷</span>
+                    <span class="rank">5</span>
+                    <span class="resource-name">🌾 GIDA</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     PROTECTION
+========================================================= -->
+
+<section id="protection" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">🛡️</div>
+        <div>
+            <h2>Koruma</h2>
+            <p>Kalkan ve otomatik güvenlik davranışlarını yönet.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🛡️</div>
+                    <div>
+                        <div class="card-title">OTOMATİK KALKAN</div>
+                        <div class="card-desc">Shield protection engine</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" onclick="toggleSetting(this,'shieldEnabled')"></div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Kalkan süresi tercihi</div>
+                        <div class="setting-note">Botun tercih edeceği süre</div>
+                    </div>
+
+                    <select data-setting="shieldDuration">
+                        <option>1 Saat</option>
+                        <option>4 Saat</option>
+                        <option selected>8 Saat</option>
+                        <option>12 Saat</option>
+                        <option>24 Saat</option>
+                        <option>3 Gün</option>
+                        <option>7 Gün</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="longestShield">
+                    Çantadaki en uzun seçeneği kullan
+                </label>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="alwaysShield">
+                    Her zaman kalkan kullan
+                </label>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" data-setting="shieldBeforeExpire">
+                    Süre bitmeden otomatik yenile
+                </label>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🚨</div>
+                    <div>
+                        <div class="card-title">TEHDİT TEPKİSİ</div>
+                        <div class="card-desc">Protection behavior</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Tehdit algılandığında</div>
+                    </div>
+
+                    <select data-setting="threatAction">
+                        <option selected>Kalkan kullan</option>
+                        <option>Orduyu geri çağır</option>
+                        <option>Bekle</option>
+                        <option>Botu durdur</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Minimum kalan süre</div>
+                    </div>
+
+                    <select data-setting="minimumShieldTime">
+                        <option>5 Dakika</option>
+                        <option selected>15 Dakika</option>
+                        <option>30 Dakika</option>
+                        <option>1 Saat</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="protectGathering">
+                    Toplama ordularını koruma moduna dahil et
+                </label>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     SUPPORT
+========================================================= -->
+
+<section id="support" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">🤝</div>
+        <div>
+            <h2>Krallık Desteği</h2>
+            <p>Guild / Kingdom kaynak desteği otomasyonu.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🤝</div>
+                    <div>
+                        <div class="card-title">DESTEK MOTORU</div>
+                        <div class="card-desc">Resource support automation</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" onclick="toggleSetting(this,'supportEnabled')"></div>
+            </div>
+
+            <div class="checkbox-grid">
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="supportFood">
+                    🌾 Gıda desteği
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="supportStone">
+                    🪨 Taş desteği
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="supportWood">
+                    🌲 Kereste desteği
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="supportOre">
+                    ⛏️ Cevher desteği
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="supportGold">
+                    🪙 Altın desteği
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">📦</div>
+                    <div>
+                        <div class="card-title">DESTEK MİKTARI</div>
+                        <div class="card-desc">Support quantity control</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Gönderilecek miktar</div>
+                    </div>
+
+                    <select data-setting="supportAmount">
+                        <option>Minimum</option>
+                        <option selected>Tavsiye edilen</option>
+                        <option>Maksimum</option>
+                        <option>Manuel</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Öncelik</div>
+                    </div>
+
+                    <select data-setting="supportPriority">
+                        <option selected>İhtiyaca göre</option>
+                        <option>Gıda</option>
+                        <option>Taş</option>
+                        <option>Kereste</option>
+                        <option>Cevher</option>
+                        <option>Altın</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     MIRAGE
+========================================================= -->
+
+<section id="mirage" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">🌫️</div>
+        <div>
+            <h2>Serap Diyarı</h2>
+            <p>Serap Diyarı kaynak ve Aytaşı işlemleri.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🌫️</div>
+                    <div>
+                        <div class="card-title">SERAP MOTORU</div>
+                        <div class="card-desc">Mirage Realm automation</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" onclick="toggleSetting(this,'mirageEnabled')"></div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Otomatik katılım</div>
+                    </div>
+
+                    <select data-setting="mirageMode">
+                        <option selected>Otomatik</option>
+                        <option>Manuel</option>
+                        <option>Kapalı</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="mirageGather">
+                    Kaynak toplamayı aktif et
+                </label>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="mirageMoonstone">
+                    🌙 Aytaşı toplamayı aktif et
+                </label>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🌙</div>
+                    <div>
+                        <div class="card-title">AYTAŞI ÖNCELİĞİ</div>
+                        <div class="card-desc">Moonstone gathering</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="priority">
+
+                <div class="priority-item">
+                    <span class="rank">1</span>
+                    <span class="resource-name">🌙 Aytaşı</span>
+                </div>
+
+                <div class="priority-item">
+                    <span class="rank">2</span>
+                    <span class="resource-name">💎 Diğer kaynaklar</span>
+                </div>
+
+            </div>
+
+            <div class="setting" style="margin-top:15px;">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Ordu tercihi</div>
+                    </div>
+
+                    <select data-setting="mirageArmy">
+                        <option selected>En uygun ordu</option>
+                        <option>En güçlü ordu</option>
+                        <option>Manuel</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     RALLY
+========================================================= -->
+
+<section id="rally" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">⚔️</div>
+        <div>
+            <h2>İctimaa</h2>
+            <p>Karanlık Yuvalar ve toplu saldırı katılım ayarları.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">⚔️</div>
+                    <div>
+                        <div class="card-title">İCTİMAA MOTORU</div>
+                        <div class="card-desc">Rally participation</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" onclick="toggleSetting(this,'rallyEnabled')"></div>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="darkNestJoin">
+                    🕳️ Karanlık Yuvalara katıl
+                </label>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Gönderilecek minimum ordu</div>
+                    </div>
+
+                    <select data-setting="rallyMinimumArmy">
+                        <option selected>En düşük seviye</option>
+                        <option>Tavsiye edilen</option>
+                        <option>En güçlü</option>
+                        <option>Manuel</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Gönderilecek ordu</div>
+                    </div>
+
+                    <select data-setting="rallyArmy">
+                        <option selected>Tavsiye edileni gönder</option>
+                        <option>En düşük orduyu gönder</option>
+                        <option>En güçlü orduyu gönder</option>
+                        <option>Manuel seç</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">👥</div>
+                    <div>
+                        <div class="card-title">KATILIM KURALLARI</div>
+                        <div class="card-desc">Rally filters</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkbox-grid">
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="rallyRecommended">
+                    Tavsiye edilen
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" data-setting="rallyMinimum">
+                    Minimum ordu
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="rallyAutoHeroes">
+                    Otomatik kahraman
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="rallyAutoFamiliar">
+                    Otomatik yoldaş
+                </label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     MONSTER
+========================================================= -->
+
+<section id="monster" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">👹</div>
+        <div>
+            <h2>Canavar Avı</h2>
+            <p>Canavar seviyeleri ve av davranışlarını yönet.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">👹</div>
+                    <div>
+                        <div class="card-title">AV MOTORU</div>
+                        <div class="card-desc">Monster hunting</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" onclick="toggleSetting(this,'monsterEnabled')"></div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Minimum seviye</div>
+                    </div>
+
+                    <select data-setting="monsterMinLevel">
+                        <option selected>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Maksimum seviye</div>
+                    </div>
+
+                    <select data-setting="monsterMaxLevel">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option selected>5</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="monsterAutoEnergy">
+                    Enerjiyi otomatik kullan
+                </label>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🦷</div>
+                    <div>
+                        <div class="card-title">KILIÇ DİŞ</div>
+                        <div class="card-desc">Saberfang special handling</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" onclick="toggleSetting(this,'saberfangEnabled')"></div>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="saberfangHunt">
+                    Kılıç Diş avına katıl
+                </label>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Öncelik</div>
+                    </div>
+
+                    <select data-setting="saberfangPriority">
+                        <option selected>Yüksek</option>
+                        <option>Normal</option>
+                        <option>Düşük</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     CARGO
+========================================================= -->
+
+<section id="cargo" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">🚢</div>
+        <div>
+            <h2>Kargo Gemisi</h2>
+            <p>Takas, alınacaklar ve verilecekleri ayrı ayrı yönet.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🚢</div>
+                    <div>
+                        <div class="card-title">TAKAS MOTORU</div>
+                        <div class="card-desc">Cargo Ship automation</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" onclick="toggleSetting(this,'cargoEnabled')"></div>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="cargoAutoRefresh">
+                    Kargo gemisini otomatik kontrol et
+                </label>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="cargoAutoTrade">
+                    Uygun takası otomatik yap
+                </label>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" data-setting="cargoPremiumOnly">
+                    Sadece avantajlı takasları kullan
+                </label>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">📤</div>
+                    <div>
+                        <div class="card-title">VERİLECEKLER</div>
+                        <div class="card-desc">Resources offered to Cargo Ship</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkbox-grid">
+
+                <label class="check"><input type="checkbox" checked data-setting="cargoGiveFood">🌾 Gıda</label>
+                <label class="check"><input type="checkbox" checked data-setting="cargoGiveWood">🌲 Kereste</label>
+                <label class="check"><input type="checkbox" checked data-setting="cargoGiveStone">🪨 Taş</label>
+                <label class="check"><input type="checkbox" checked data-setting="cargoGiveOre">⛏️ Cevher</label>
+                <label class="check"><input type="checkbox" checked data-setting="cargoGiveGold">🪙 Altın</label>
+
+            </div>
+
+        </div>
+
+
+        <div class="card full">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">📥</div>
+                    <div>
+                        <div class="card-title">ALINACAKLAR</div>
+                        <div class="card-desc">Botun takas sonucunda tercih edeceği ödüller</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chips">
+
+                <div class="chip active" data-chip="cargoReward1">⏱️ Hızlandırma</div>
+                <div class="chip" data-chip="cargoReward2">🎒 Eşya</div>
+                <div class="chip active" data-chip="cargoReward3">💎 Mücevher</div>
+                <div class="chip" data-chip="cargoReward4">🌾 Gıda</div>
+                <div class="chip" data-chip="cargoReward5">🌲 Kereste</div>
+                <div class="chip" data-chip="cargoReward6">🪨 Taş</div>
+                <div class="chip" data-chip="cargoReward7">⛏️ Cevher</div>
+                <div class="chip" data-chip="cargoReward8">🪙 Altın</div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     BUILDING
+========================================================= -->
+
+<section id="building" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">🏗️</div>
+        <div>
+            <h2>İnşaat</h2>
+            <p>Binaları otomatik geliştirme ve öncelik sistemi.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🏗️</div>
+                    <div>
+                        <div class="card-title">İNŞAAT MOTORU</div>
+                        <div class="card-desc">Building automation</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" onclick="toggleSetting(this,'buildingEnabled')"></div>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="autoUpgrade">
+                    Otomatik yükselt
+                </label>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="autoUseSpeedups">
+                    Uygun hızlandırmaları kullan
+                </label>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" data-setting="upgradeOnlyReady">
+                    Sadece hazır yükseltmeleri yap
+                </label>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🏰</div>
+                    <div>
+                        <div class="card-title">BİNA ÖNCELİĞİ</div>
+                        <div class="card-desc">Drag to reorder priority</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="priority">
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">1</span>
+                    <span class="resource-name">🏰 Kale</span>
+                </div>
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">2</span>
+                    <span class="resource-name">🌾 Kaynak Binaları</span>
+                </div>
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">3</span>
+                    <span class="resource-name">🔬 Akademi</span>
+                </div>
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">4</span>
+                    <span class="resource-name">🏛️ Malikâne</span>
+                </div>
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">5</span>
+                    <span class="resource-name">🪖 Kışla</span>
+                </div>
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">6</span>
+                    <span class="resource-name">🐲 Yoldaş Binaları</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     RESEARCH
+========================================================= -->
+
+<section id="research" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">🔬</div>
+        <div>
+            <h2>Araştırma</h2>
+            <p>Akademi araştırmalarını kategori ve öncelik bazında yönet.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🔬</div>
+                    <div>
+                        <div class="card-title">ARAŞTIRMA MOTORU</div>
+                        <div class="card-desc">Research automation</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" onclick="toggleSetting(this,'researchEnabled')"></div>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="autoResearch">
+                    Otomatik araştırma
+                </label>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="researchSpeedups">
+                    Uygun araştırma hızlandırmalarını kullan
+                </label>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="researchAutoSelect">
+                    En uygun araştırmayı otomatik seç
+                </label>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🧠</div>
+                    <div>
+                        <div class="card-title">ARAŞTIRMA KATEGORİLERİ</div>
+                        <div class="card-desc">Research focus</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkbox-grid">
+
+                <label class="check"><input type="checkbox" checked data-setting="researchMilitary">⚔️ Askeri</label>
+                <label class="check"><input type="checkbox" checked data-setting="researchEconomy">💰 Ekonomi</label>
+                <label class="check"><input type="checkbox" checked data-setting="researchDefense">🛡️ Savunma</label>
+                <label class="check"><input type="checkbox" checked data-setting="researchMonster">👹 Canavar Avı</label>
+                <label class="check"><input type="checkbox" checked data-setting="researchArmy">🪖 Ordu</label>
+                <label class="check"><input type="checkbox" checked data-setting="researchGather">🗺️ Toplama</label>
+                <label class="check"><input type="checkbox" checked data-setting="researchDevelopment">🏗️ Gelişim</label>
+                <label class="check"><input type="checkbox" checked data-setting="researchFamiliar">🐲 Yoldaş</label>
+
+            </div>
+
+        </div>
+
+
+        <div class="card full">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🥇</div>
+                    <div>
+                        <div class="card-title">ARAŞTIRMA ÖNCELİĞİ</div>
+                        <div class="card-desc">Birden fazla kategori arasında tercih sırası</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="priority">
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">1</span>
+                    <span class="resource-name">⚔️ Askeri</span>
+                </div>
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">2</span>
+                    <span class="resource-name">🪖 Ordu</span>
+                </div>
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">3</span>
+                    <span class="resource-name">👹 Canavar Avı</span>
+                </div>
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">4</span>
+                    <span class="resource-name">💰 Ekonomi</span>
+                </div>
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">5</span>
+                    <span class="resource-name">🗺️ Toplama</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     ARMY
+========================================================= -->
+
+<section id="army" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">🪖</div>
+        <div>
+            <h2>Ordu Eğitimi</h2>
+            <p>Asker eğitim döngüsünü ve miktarlarını yönet.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🪖</div>
+                    <div>
+                        <div class="card-title">EĞİTİM MOTORU</div>
+                        <div class="card-desc">Army training automation</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" onclick="toggleSetting(this,'armyTrainingEnabled')"></div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Asker türü</div>
+                    </div>
+
+                    <select data-setting="armyType">
+                        <option selected>Tavsiye edilen</option>
+                        <option>Piyade</option>
+                        <option>Süvari</option>
+                        <option>Uzun menzil</option>
+                        <option>Kușatma</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Eğitim miktarı</div>
+                    </div>
+
+                    <select data-setting="trainingAmount">
+                        <option>Minimum</option>
+                        <option selected>Tavsiye edilen</option>
+                        <option>Maksimum</option>
+                        <option>Manuel</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="trainingLoop">
+                    Eğitim döngüsünü sürekli çalıştır
+                </label>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">📚</div>
+                    <div>
+                        <div class="card-title">EĞİTİM KURALLARI</div>
+                        <div class="card-desc">Training conditions</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkbox-grid">
+
+                <label class="check"><input type="checkbox" checked data-setting="trainAutoQueue">Otomatik sıra</label>
+                <label class="check"><input type="checkbox" checked data-setting="trainUseBoost">Eğitim boost'u kullan</label>
+                <label class="check"><input type="checkbox" data-setting="trainStopLowFood">Gıda azalırsa durdur</label>
+                <label class="check"><input type="checkbox" checked data-setting="trainAllBarracks">Tüm kışlaları kullan</label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     HEROES
+========================================================= -->
+
+<section id="heroes" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">🦸</div>
+        <div>
+            <h2>Kahramanlar</h2>
+            <p>Hero Stage, Elite Stage ve Kolezyum yönetimi.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🦸</div>
+                    <div>
+                        <div class="card-title">HERO STAGE</div>
+                        <div class="card-desc">Hero stage automation</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" onclick="toggleSetting(this,'heroEnabled')"></div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Etap türü</div>
+                    </div>
+
+                    <select data-setting="heroStageType">
+                        <option selected>Normal</option>
+                        <option>Elite</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Bölüm</div>
+                    </div>
+
+                    <select data-setting="heroStageChapter">
+                        <option selected>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>Otomatik</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🏟️</div>
+                    <div>
+                        <div class="card-title">KOLEZYUM</div>
+                        <div class="card-desc">Colosseum automation</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" onclick="toggleSetting(this,'colosseumEnabled')"></div>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="playColosseum">
+                    Kolezyum oyna
+                </label>
+            </div>
+
+            <div class="setting">
+                <label class="check">
+                    <input type="checkbox" checked data-setting="collectGems">
+                    💎 Mücevherleri topla
+                </label>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Deneme davranışı</div>
+                    </div>
+
+                    <select data-setting="colosseumAttempts">
+                        <option selected>Otomatik</option>
+                        <option>Maksimum deneme</option>
+                        <option>Minimum risk</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     EQUIPMENT
+========================================================= -->
+
+<section id="equipment" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">⚙️</div>
+        <div>
+            <h2>Ekipman</h2>
+            <p>Göreve göre otomatik ekipman seti değiştirme.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">⚙️</div>
+                    <div>
+                        <div class="card-title">SET MOTORU</div>
+                        <div class="card-desc">Automatic equipment switching</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" onclick="toggleSetting(this,'equipmentEnabled')"></div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Boşta bekleme seti</div>
+                    </div>
+
+                    <select data-setting="idleSet">
+                        <option selected>Hiçbiri</option>
+                        <option>Ekonomi Seti</option>
+                        <option>Gelişim Seti</option>
+                        <option>Özel Set</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🎯</div>
+                    <div>
+                        <div class="card-title">GÖREV SETLERİ</div>
+                        <div class="card-desc">Task-specific equipment</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row"><span class="setting-name">🐲 Yoldaş</span><select data-setting="setFamiliar"><option>Hiçbiri</option><option selected>Otomatik</option><option>Özel Set</option></select></div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row"><span class="setting-name">👹 Av</span><select data-setting="setHunt"><option>Hiçbiri</option><option selected>Otomatik</option><option>Av Seti</option></select></div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row"><span class="setting-name">🗺️ Toplama</span><select data-setting="setGather"><option>Hiçbiri</option><option selected>Otomatik</option><option>Toplama Seti</option></select></div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row"><span class="setting-name">🔬 Araştırma</span><select data-setting="setResearch"><option>Hiçbiri</option><option selected>Otomatik</option><option>Araştırma Seti</option></select></div>
+            </div>
+
+        </div>
+
+
+        <div class="card full">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🧩</div>
+                    <div>
+                        <div class="card-title">DİĞER SETLER</div>
+                        <div class="card-desc">Automation mapping</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkbox-grid">
+
+                <label class="check"><input type="checkbox" checked data-setting="equipmentConstruction">🏗️ İnşaat</label>
+                <label class="check"><input type="checkbox" checked data-setting="equipmentTraining">🪖 Eğitim</label>
+                <label class="check"><input type="checkbox" checked data-setting="equipmentHero">🦸 Nişan</label>
+                <label class="check"><input type="checkbox" checked data-setting="equipmentFood">🌾 Gıda desteği</label>
+                <label class="check"><input type="checkbox" checked data-setting="equipmentStone">🪨 Taş desteği</label>
+                <label class="check"><input type="checkbox" checked data-setting="equipmentWood">🌲 Kereste desteği</label>
+                <label class="check"><input type="checkbox" checked data-setting="equipmentOre">⛏️ Cevher desteği</label>
+                <label class="check"><input type="checkbox" checked data-setting="equipmentGold">🪙 Altın desteği</label>
+                <label class="check"><input type="checkbox" checked data-setting="equipmentMarch">🏃 Sefer hızı</label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     FAMILIARS
+========================================================= -->
+
+<section id="familiars" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">🐲</div>
+        <div>
+            <h2>Yoldaşlar</h2>
+            <p>Anlaşma açma, birleştirme ve parça yönetimi.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🐲</div>
+                    <div>
+                        <div class="card-title">YOLDAŞ MOTORU</div>
+                        <div class="card-desc">Familiar automation</div>
+                    </div>
+                </div>
+
+                <div class="toggle on" onclick="toggleSetting(this,'familiarEnabled')"></div>
+            </div>
+
+            <div class="checkbox-grid">
+
+                <label class="check"><input type="checkbox" checked data-setting="openPact">Anlaşma aç</label>
+                <label class="check"><input type="checkbox" checked data-setting="mergePact">Anlaşma birleştir</label>
+                <label class="check"><input type="checkbox" checked data-setting="familiarEqual">Kahramanları eşit paylaştır</label>
+                <label class="check"><input type="checkbox" checked data-setting="familiarAutoLevel">Otomatik geliştirme</label>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">📜</div>
+                    <div>
+                        <div class="card-title">ANLAŞMALAR</div>
+                        <div class="card-desc">Pact priority</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkbox-grid">
+
+                <label class="check"><input type="checkbox" checked data-setting="pact1a">Pact 1A</label>
+                <label class="check"><input type="checkbox" checked data-setting="pact1b">Pact 1B</label>
+                <label class="check"><input type="checkbox" checked data-setting="pact2a">Pact 2A</label>
+                <label class="check"><input type="checkbox" checked data-setting="pact2b">Pact 2B</label>
+                <label class="check"><input type="checkbox" checked data-setting="pact3">Pact 3</label>
+                <label class="check"><input type="checkbox" checked data-setting="pact4">Pact 4</label>
+
+            </div>
+
+        </div>
+
+
+        <div class="card full">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🧩</div>
+                    <div>
+                        <div class="card-title">PARÇA YÖNETİMİ</div>
+                        <div class="card-desc">Daily fragment limits</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid">
+
+                <div class="setting">
+                    <div class="setting-row">
+                        <div>
+                            <div class="setting-name">Günlük parça limiti</div>
+                            <div class="setting-note">Bir günde kullanılabilecek toplam parça</div>
+                        </div>
+                        <input type="number" min="0" value="100" data-setting="dailyFragmentLimit">
+                    </div>
+                </div>
+
+                <div class="setting">
+                    <div class="setting-row">
+                        <div>
+                            <div class="setting-name">Kullanılacak parça sayısı</div>
+                        </div>
+                        <input type="number" min="0" value="50" data-setting="fragmentUseAmount">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     BANK
+========================================================= -->
+
+<section id="bank" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">🏦</div>
+        <div>
+            <h2>Banka</h2>
+            <p>Kaynak transferi ve yönetici erişim ayarları.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🏦</div>
+                    <div>
+                        <div class="card-title">BANKA MODU</div>
+                        <div class="card-desc">Bank transfer automation</div>
+                    </div>
+                </div>
+
+                <div class="toggle" onclick="toggleSetting(this,'bankEnabled')"></div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Maksimum gönderim limiti</div>
+                    </div>
+
+                    <input type="number" value="100000" min="0" data-setting="bankMaxSend">
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Komut simgesi</div>
+                    </div>
+
+                    <input type="text" value="/send" data-setting="bankCommand">
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">👥</div>
+                    <div>
+                        <div class="card-title">YÖNETİCİ LİSTESİ</div>
+                        <div class="card-desc">Authorized operators</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Yönetici ekleme</div>
+                    </div>
+
+                    <input type="text" placeholder="Oyuncu adı" data-setting="bankAdminAdd">
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn" onclick="showToast('Yönetici','Yönetici ekleme arayüzü hazır.')">
+                    + YÖNETİCİ EKLE
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     SESSION
+========================================================= -->
+
+<section id="session" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">🔄</div>
+        <div>
+            <h2>Oturum</h2>
+            <p>Bağlantı, yeniden giriş ve cihaz davranışları.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🔄</div>
+                    <div>
+                        <div class="card-title">YENİDEN BAĞLANMA</div>
+                        <div class="card-desc">Session recovery</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Yeniden bağlanma süresi</div>
+                        <div class="setting-note">Bağlantı kopunca beklenecek süre</div>
+                    </div>
+
+                    <select data-setting="reconnectTime">
+                        <option>5 saniye</option>
+                        <option>10 saniye</option>
+                        <option selected>30 saniye</option>
+                        <option>60 saniye</option>
+                        <option>120 saniye</option>
+                        <option>300 saniye</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Başka cihazdan giriş sonrası</div>
+                    </div>
+
+                    <select data-setting="otherDeviceWait">
+                        <option>10 saniye</option>
+                        <option>30 saniye</option>
+                        <option selected>60 saniye</option>
+                        <option>120 saniye</option>
+                        <option>300 saniye</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🔐</div>
+                    <div>
+                        <div class="card-title">OTURUM GÜVENLİĞİ</div>
+                        <div class="card-desc">Session behavior</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkbox-grid">
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="autoReconnect">
+                    Otomatik yeniden bağlan
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="sessionVerify">
+                    Oturum doğrulaması
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" data-setting="stopAfterFailedLogin">
+                    Başarısız girişte botu durdur
+                </label>
+
+                <label class="check">
+                    <input type="checkbox" checked data-setting="deviceLock">
+                    Cihaz kilidini kullan
+                </label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     GENERAL
+========================================================= -->
+
+<section id="general" class="section">
+
+    <div class="section-title">
+        <div class="section-title-icon">⚙️</div>
+        <div>
+            <h2>Genel Ayarlar</h2>
+            <p>Botun çalışma sırası ve genel davranışları.</p>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">🤖</div>
+                    <div>
+                        <div class="card-title">ÇALIŞMA MODU</div>
+                        <div class="card-desc">Automation behavior</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Bot modu</div>
+                    </div>
+
+                    <select data-setting="botMode">
+                        <option selected>Otomatik Mod</option>
+                        <option>Manuel Mod</option>
+                        <option>Görev Sırası</option>
+                        <option>Ekonomi Modu</option>
+                        <option>Savaş Modu</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-name">Görevler arası bekleme</div>
+                    </div>
+
+                    <select data-setting="taskDelay">
+                        <option>1 saniye</option>
+                        <option>3 saniye</option>
+                        <option selected>5 saniye</option>
+                        <option>10 saniye</option>
+                        <option>30 saniye</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">📋</div>
+                    <div>
+                        <div class="card-title">GÖREV SIRASI</div>
+                        <div class="card-desc">Global automation priorities</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="priority">
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">1</span>
+                    <span class="resource-name">🛡️ Güvenlik</span>
+                </div>
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">2</span>
+                    <span class="resource-name">🔬 Araştırma</span>
+                </div>
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">3</span>
+                    <span class="resource-name">🏗️ İnşaat</span>
+                </div>
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">4</span>
+                    <span class="resource-name">🪖 Eğitim</span>
+                </div>
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">5</span>
+                    <span class="resource-name">🗺️ Toplama</span>
+                </div>
+
+                <div class="priority-item" draggable="true">
+                    <span class="drag">☷</span>
+                    <span class="rank">6</span>
+                    <span class="resource-name">👹 Canavar</span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card full">
+
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">💾</div>
+                    <div>
+                        <div class="card-title">YAPILANDIRMA</div>
+                        <div class="card-desc">Configuration management</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-row">
+
+                <button class="btn" onclick="saveAll()">
+                    💾 TÜM AYARLARI KAYDET
+                </button>
+
+                <button class="btn red" onclick="resetSettings()">
+                    ↺ AYARLARI SIFIRLA
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+</main>
+</div>
+
+
+<!-- ================= TOAST ================= -->
+
+
+<div class="toast" id="toast">
+    <strong id="toastTitle">LORDSBOT</strong>
+    <span id="toastMessage">İşlem tamamlandı.</span>
+</div>
+
+
+<script>
+let toastTimer;
+/* =========================================================
+   CONFIG
+========================================================= */
+
+const API_URL = "http://127.0.0.1:8001";
+
+let settings = JSON.parse(
+    localStorage.getItem("lordsbot_settings") || "{}"
+);
+
+
+/* =========================================================
+   USER
+========================================================= */
+
+const username =
+    localStorage.getItem("username") ||
+    "OPERATOR";
+
+document.getElementById("heroUsername").textContent =
+    username.toUpperCase();
+
+document.getElementById("sideUsername").textContent =
+    username;
+
+document.getElementById("accountUsername").textContent =
+    username;
+
+document.getElementById("avatar").textContent =
+    username.charAt(0).toUpperCase();
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function openSection(id, button){
+
+    document.querySelectorAll(".section")
+        .forEach(section=>{
+            section.classList.remove("active");
+        });
+
+    const target = document.getElementById(id);
+
+    if(target){
+        target.classList.add("active");
+    }
+
+    document.querySelectorAll(".nav-item")
+        .forEach(item=>{
+            item.classList.remove("active");
+        });
+
+    if(button){
+        button.classList.add("active");
+    }else{
+        const nav =
+            document.querySelector(
+                `.nav-item[data-section="${id}"]`
+            );
+
+        if(nav) nav.classList.add("active");
+    }
+
+    const names = {
+        overview:"DASHBOARD",
+        gather:"RESOURCE GATHERING",
+        protection:"PROTECTION",
+        support:"KINGDOM SUPPORT",
+        mirage:"MIRAGE REALM",
+        rally:"RALLY",
+        monster:"MONSTER HUNT",
+        cargo:"CARGO SHIP",
+        building:"BUILDING",
+        research:"RESEARCH",
+        army:"ARMY TRAINING",
+        heroes:"HEROES",
+        equipment:"EQUIPMENT",
+        familiars:"FAMILIARS",
+        bank:"BANK",
+        session:"SESSION",
+        general:"GENERAL SETTINGS"
+    };
+
+    document.getElementById("breadcrumb").textContent =
+        names[id] || "DASHBOARD";
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+}
+
+function mobileNavigate(id){
+    openSection(id);
+}
+
+
+/* =========================================================
+   HOME
+========================================================= */
+
+function goHome(){
+    window.location.href = "index.html";
+}
+
+
+/* =========================================================
+   TOGGLE
+========================================================= */
+
+function toggleSetting(element,key){
+
+    element.classList.toggle("on");
+
+    settings[key] =
+        element.classList.contains("on");
+
+    saveSettings(false);
+}
+
+
+/* =========================================================
+   FORM SETTINGS
+========================================================= */
+
+document.querySelectorAll("[data-setting]")
+.forEach(element=>{
+
+    if(element.classList.contains("toggle")){
+        return;
+    }
+
+    const key = element.dataset.setting;
+
+    if(
+        settings[key] !== undefined &&
+        element.type !== "checkbox"
+    ){
+        element.value = settings[key];
+    }
+
+    if(
+        settings[key] !== undefined &&
+        element.type === "checkbox"
+    ){
+        element.checked = settings[key];
+    }
+
+    element.addEventListener("change",()=>{
+
+        if(element.type === "checkbox"){
+            settings[key] = element.checked;
+        }else{
+            settings[key] = element.value;
+        }
+
+        saveSettings(false);
+        updateConfigCount();
+
+    });
+
+});
+
+
+/* =========================================================
+   TOGGLE RESTORE
+========================================================= */
+
+document.querySelectorAll(".toggle")
+.forEach(toggle=>{
+
+    const key = toggle.getAttribute("onclick")
+        ?.match(/'([^']+)'/)?.[1];
+
+    if(
+        key &&
+        settings[key] !== undefined
+    ){
+
+        toggle.classList.toggle(
+            "on",
+            settings[key]
+        );
+
+    }
+
+});
+
+
+/* =========================================================
+   DRAG & DROP PRIORITY
+========================================================= */
+
+let draggedItem = null;
+
+function initDragDrop(){
+
+    document.querySelectorAll(".priority-item")
+    .forEach(item=>{
+
+        item.addEventListener("dragstart",()=>{
+            draggedItem = item;
+            item.classList.add("dragging");
+        });
+
+        item.addEventListener("dragend",()=>{
+            item.classList.remove("dragging");
+            draggedItem = null;
+            updateRanks();
+            savePriorities();
+        });
+
+        item.addEventListener("dragover",(e)=>{
+            e.preventDefault();
+
+            if(
+                !draggedItem ||
+                draggedItem === item
+            ) return;
+
+            const container = item.parentNode;
+            const rect = item.getBoundingClientRect();
+
+            const after =
+                e.clientY >
+                rect.top + rect.height / 2;
+
+            if(after){
+                container.insertBefore(
+                    draggedItem,
+                    item.nextSibling
+                );
+            }else{
+                container.insertBefore(
+                    draggedItem,
+                    item
+                );
+            }
+        });
+
+    });
+
+}
+
+function updateRanks(){
+
+    document.querySelectorAll(".priority")
+    .forEach(container=>{
+
+        [...container.children]
+        .forEach((item,index)=>{
+
+            const rank =
+                item.querySelector(".rank");
+
+            if(rank){
+                rank.textContent = index + 1;
+            }
+
+        });
+
+    });
+
+}
+
+function savePriorities(){
+
+    const resourcePriority =
+        [...document.querySelectorAll(
+            "#resourcePriority .priority-item"
+        )].map(
+            item=>item.dataset.resource
+        );
+
+    settings.resourcePriority =
+        resourcePriority;
+
+    saveSettings(false);
+
+    showToast(
+        "Öncelik güncellendi",
+        "Yeni sıralama kaydedildi."
+    );
+}
+
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+async function saveSettings(show=true){
+
+    // Önce tarayıcıya kaydet
+    localStorage.setItem(
+        "lordsbot_settings",
+        JSON.stringify(settings)
+    );
+
+    // Bot motoruna gönder
+    try{
+
+        const response = await fetch(
+            API_URL + "/api/bot/settings",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(settings)
+            }
+        );
+
+        if(!response.ok){
+            throw new Error(
+                "API hata kodu: " + response.status
+            );
+        }
+
+        console.log(
+            "LordsBot ayarları API'ye gönderildi."
+        );
+
+    }catch(error){
+
+        console.error(
+            "Settings API:",
+            error
+        );
+
+    }
+
+    if(show){
+
+        showToast(
+            "Ayarlar kaydedildi",
+            "LordsBot yapılandırması güncellendi."
+        );
+
+    }
+
+    updateConfigCount();
+}
+
+function saveAll(){
+
+    document.querySelectorAll("[data-setting]")
+    .forEach(element=>{
+
+        const key =
+            element.dataset.setting;
+
+        if(
+            element.classList.contains("toggle")
+        ){
+            settings[key] =
+                element.classList.contains("on");
+        }else if(element.type === "checkbox"){
+            settings[key] =
+                element.checked;
+        }else{
+            settings[key] =
+                element.value;
+        }
+
+    });
+
+    saveSettings(true);
+}
+
+
+/* =========================================================
+   CONFIG COUNT
+========================================================= */
+
+function updateConfigCount(){
+
+    const count =
+        Object.keys(settings).length;
+
+    document.getElementById(
+        "configCount"
+    ).textContent = count;
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function resetSettings(){
+
+    if(
+        !confirm(
+            "Tüm dashboard ayarlarını sıfırlamak istediğine emin misin?"
+        )
+    ) return;
+
+    localStorage.removeItem(
+        "lordsbot_settings"
+    );
+
+    settings = {};
+
+    showToast(
+        "Yapılandırma sıfırlandı",
+        "Sayfa varsayılan ayarlarla yenileniyor."
+    );
+
+    setTimeout(()=>{
+        location.reload();
+    },700);
+}
+
+
+/* =========================================================
+   BOT
+========================================================= */
+
+/* =========================================================
+   BOT
+========================================================= */
+
+/* =========================================================
+   BOT
+========================================================= */
+
+async function startBot(){
+
+    try{
+
+        const response = await fetch(
+            API_URL + "/api/bot/start",
+            {
+                method: "POST"
+            }
+        );
+
+        if(!response.ok){
+            throw new Error("API hata kodu: " + response.status);
+        }
+
+        const data = await response.json();
+
+        if(data.success){
+
+            document.getElementById("statBot").textContent = "RUNNING";
+
+            document.getElementById("botStateText").textContent =
+                "BOT ÇALIŞIYOR";
+
+            document.getElementById("currentTask").textContent =
+                "Otomatik görev motoru aktif";
+
+            showToast(
+                "BOT BAŞLATILDI",
+                "LordsBot motoru çalışıyor."
+            );
+
+        }else{
+
+            showToast(
+                "BOT ZATEN ÇALIŞIYOR",
+                "Bot zaten aktif durumda."
+            );
+
+        }
+
+    }catch(error){
+
+        console.error("Start Bot:", error);
+
+        showToast(
+            "BAĞLANTI HATASI",
+            "LordsBot API'ye bağlanılamadı."
+        );
+
+    }
+
+}
+
+
+async function stopBot(){
+
+    try{
+
+        const response = await fetch(
+            API_URL + "/api/bot/stop",
+            {
+                method: "POST"
+            }
+        );
+
+        if(!response.ok){
+            throw new Error("API hata kodu: " + response.status);
+        }
+
+        const data = await response.json();
+
+        if(data.success){
+
+            document.getElementById("statBot").textContent = "IDLE";
+
+            document.getElementById("botStateText").textContent =
+                "BOT BEKLEMEDE";
+
+            document.getElementById("currentTask").textContent =
+                "Bekliyor — görev seçilmedi";
+
+            showToast(
+                "BOT DURDURULDU",
+                "LordsBot motoru durduruldu."
+            );
+
+        }else{
+
+            showToast(
+                "BOT ZATEN DURMUŞ",
+                "Bot zaten bekleme durumunda."
+            );
+
+        }
+
+    }catch(error){
+
+        console.error("Stop Bot:", error);
+
+        showToast(
+            "BAĞLANTI HATASI",
+            "LordsBot API'ye bağlanılamadı."
+        );
+
+    }
+
+}
+
+function showToast(title,message){
+
+    const toast =
+        document.getElementById("toast");
+
+    document.getElementById(
+        "toastTitle"
+    ).textContent = title;
+
+    document.getElementById(
+        "toastMessage"
+    ).textContent = message;
+
+    toast.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer =
+        setTimeout(()=>{
+            toast.classList.remove("show");
+        },3000);
+}
+
+
+/* =========================================================
+   LICENSE API
+========================================================= */
+
+async function loadLicense(){
+
+    const token =
+        localStorage.getItem("access_token");
+
+    if(!token) return;
+
+    try{
+
+        const response =
+            await fetch(
+                API_URL + "/api/licenses/my",
+                {
+                    headers:{
+                        Authorization:
+                            "Bearer " + token
+                    }
+                }
+            );
+
+        if(!response.ok) return;
+
+        const data =
+            await response.json();
+
+        if(
+            Array.isArray(data) &&
+            data.length
+        ){
+
+            const license = data[0];
+
+            document.getElementById(
+                "licenseKey"
+            ).textContent =
+                license.key || "ACTIVE";
+
+            if(license.expires_at){
+
+                const expiry =
+                    new Date(
+                        license.expires_at
+                    );
+
+                const now =
+                    new Date();
+
+                const diff =
+                    expiry - now;
+
+                const days =
+                    Math.max(
+                        0,
+                        Math.ceil(
+                            diff /
+                            (1000*60*60*24)
+                        )
+                    );
+
+                document.getElementById(
+                    "daysLeft"
+                ).textContent =
+                    days;
+            }
+
+        }
+
+    }catch(error){
+
+        console.log(
+            "License API:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   AUTH
+========================================================= */
+
+function logout(){
+
+    localStorage.removeItem(
+        "access_token"
+    );
+
+    localStorage.removeItem(
+        "username"
+    );
+
+    localStorage.removeItem(
+        "is_admin"
+    );
+
+    window.location.href =
+        "index.html";
+}
+
+
+/* =========================================================
+   CHIP CONTROLS
+========================================================= */
+
+document.querySelectorAll(".chip")
+.forEach(chip=>{
+
+    chip.addEventListener("click",()=>{
+
+        chip.classList.toggle("active");
+
+        settings[
+            chip.dataset.chip
+        ] =
+            chip.classList.contains("active");
+
+        saveSettings(false);
+
+    });
+
+});
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+initDragDrop();
+updateRanks();
+updateConfigCount();
+loadLicense();
+
+
+/* =========================================================
+   RESTORE PRIORITY
+========================================================= */
+
+if(
+    Array.isArray(settings.resourcePriority)
+){
+
+    const container =
+        document.getElementById(
+            "resourcePriority"
+        );
+
+    settings.resourcePriority
+    .forEach(resource=>{
+
+        const item =
+            container.querySelector(
+                `[data-resource="${resource}"]`
+            );
+
+        if(item){
+            container.appendChild(item);
+        }
+
+    });
+
+    updateRanks();
+
+}
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    e=>{
+
+        if(e.ctrlKey && e.key === "s"){
+
+            e.preventDefault();
+
+            saveAll();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   AUTO SAVE
+========================================================= */
+
+setInterval(()=>{
+    saveSettings(false);
+},15000);
+/* =========================================================
+   LIVE BOT STATUS
+========================================================= */
+
+async function updateBotStatus(){
+
+    try{
+
+        const response = await fetch(
+            API_URL + "/api/bot/status"
+        );
+
+        if(!response.ok){
+            throw new Error("Bot status API error");
+        }
+
+        const data = await response.json();
+
+        const statBot =
+            document.getElementById("statBot");
+
+        const botStateText =
+            document.getElementById("botStateText");
+
+        const currentTask =
+            document.getElementById("currentTask");
+
+        const heroStatus =
+            document.querySelector(".hero-status");
+
+        const statusDot =
+            document.querySelector(".status-dot");
+
+        if(data.running){
+
+            if(statBot){
+                statBot.textContent = "RUNNING";
+            }
+
+            if(botStateText){
+                botStateText.textContent =
+                    "BOT ÇALIŞIYOR";
+            }
+
+            if(currentTask){
+                currentTask.textContent =
+                    "Otomasyon motoru aktif";
+            }
+
+            if(heroStatus){
+                heroStatus.innerHTML =
+                    '<span class="status-dot"></span> BOT ONLINE';
+            }
+
+            if(statusDot){
+                statusDot.classList.add("online");
+            }
+
+        }else{
+
+            if(statBot){
+                statBot.textContent = "IDLE";
+            }
+
+            if(botStateText){
+                botStateText.textContent =
+                    "BOT BEKLEMEDE";
+            }
+
+            if(currentTask){
+                currentTask.textContent =
+                    "Bekliyor — görev seçilmedi";
+            }
+
+            if(heroStatus){
+                heroStatus.innerHTML =
+                    '<span class="status-dot"></span> SYSTEM READY';
+            }
+
+        }
+
+    }catch(error){
+
+        console.error(
+            "Bot status alınamadı:",
+            error
+        );
+
+        const statBot =
+            document.getElementById("statBot");
+
+        const botStateText =
+            document.getElementById("botStateText");
+
+        if(statBot){
+            statBot.textContent = "OFFLINE";
+        }
+
+        if(botStateText){
+            botStateText.textContent =
+                "BACKEND BAĞLANTISI YOK";
+        }
+
+    }
+
+}
+
+
+/* İlk kontrol */
+updateBotStatus();
+
+
+/* Her 2 saniyede bir backend'i kontrol et */
+setInterval(
+    updateBotStatus,
+    2000
+);
+
+</script>
+
+</body>
+</html>
+```

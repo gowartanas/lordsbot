@@ -1,0 +1,1 @@
+from .heroes import HeroesTask
